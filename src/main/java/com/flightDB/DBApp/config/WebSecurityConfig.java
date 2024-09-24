@@ -26,13 +26,6 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(authRequest ->
                         authRequest
                                 .requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("/api/payement/buy/**").permitAll()
-                                .requestMatchers("/api/cart/**").permitAll()
-                                .requestMatchers("/api/course//**").permitAll()
-                                .requestMatchers("/api/course/**").permitAll()
-                                .requestMatchers("/api/experience/**").permitAll()
-                                .requestMatchers("/api/userDetails/**").permitAll()
-                                .requestMatchers("/api/userDetails/create").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManager ->
