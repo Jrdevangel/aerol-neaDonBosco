@@ -12,8 +12,18 @@ import lombok.*;
 @AllArgsConstructor
 @Table
 public class Passengers {
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+
+    @Column(name = "Capacity")
+    private String capacity;
+
+    @Column(name = "ReservedSeats")
+    private String reservedSeats;
+
 
 }
