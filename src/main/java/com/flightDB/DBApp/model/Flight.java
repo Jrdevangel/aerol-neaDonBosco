@@ -1,8 +1,11 @@
 package com.flightDB.DBApp.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.Set;
 
 @Data
 @Builder
@@ -32,4 +35,8 @@ public class Flight {
     @JoinColumn(name = "passengers_ID", nullable = true)
     @JsonBackReference(value = "passengers-reference")
     private Passengers passengers;
+
+    @OneToMany(mappedBy = "flight", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference(value = "flight-reservation-reference")
+    private Set<Reservation> reservations;
 }

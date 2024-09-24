@@ -1,5 +1,6 @@
 package com.flightDB.DBApp.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -8,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -59,4 +61,9 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }}
+    }
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference(value = "user-reservation-reference")
+    private Set<Reservation> reservations;
+
+}

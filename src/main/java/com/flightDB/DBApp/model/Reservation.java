@@ -1,5 +1,6 @@
 package com.flightDB.DBApp.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,4 +17,13 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "flight_ID", nullable = false)
+    @JsonBackReference(value = "flight-reservation-reference")
+    private Flight flight;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_ID", nullable = false)
+    @JsonBackReference(value = "user-reservation-reference")
+    private User user;
 }
