@@ -5,15 +5,15 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.util.Set;
 
-@Data
-@Builder
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Table
 public class Routes {
+    public Routes(Long id, String country, String city) {
+        this.id = id;
+        this.country = country;
+        this.city = city;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

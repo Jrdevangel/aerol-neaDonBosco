@@ -5,21 +5,27 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Set;
 
-@Data
-@Builder
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Table(name = "Flight")
 public class Flight {
+    public Flight(Long id, LocalDate departureTime, Routes destination, Routes origin, Passengers passengers) {
+        this.id = id;
+        this.departureTime = departureTime;
+        this.destination = destination;
+        this.origin = origin;
+        this.passengers = passengers;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column
+    private LocalDate departureTime;
 
     @ManyToOne(optional = true)
     @JoinColumn(name = "destination_ID", nullable = true)
@@ -39,4 +45,5 @@ public class Flight {
     @OneToMany(mappedBy = "flight", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "flight-reservation-reference")
     private Set<Reservation> reservations;
+
 }

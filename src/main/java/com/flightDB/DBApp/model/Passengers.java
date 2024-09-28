@@ -5,25 +5,25 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.util.Set;
 
-@Data
-@Builder
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Table(name = "Passengers")
 public class Passengers {
+    public Passengers(Long id, int capacity, int reservedSeats) {
+        this.id = id;
+        this.capacity = capacity;
+        this.reservedSeats = reservedSeats;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "Capacity")
-    private String capacity;
+    private int capacity;
 
     @Column(name = "ReservedSeats")
-    private String reservedSeats;
+    private int reservedSeats;
 
     @OneToMany(mappedBy = "passengers", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "passengers-reference")
