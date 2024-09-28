@@ -26,6 +26,22 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(authRequest ->
                         authRequest
                                 .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/api/v1/new/routes").hasAuthority("ADMIN")
+                                .requestMatchers("/api/v1/delete/routes/{id}").hasAuthority("ADMIN")
+                                .requestMatchers("/api/v1/update/routes/{id}").hasAuthority("ADMIN")
+                                .requestMatchers("/api/v1/routes/**").permitAll()
+                                .requestMatchers("/api/v1/new/reservation").hasAnyAuthority("ADMIN", "USER")
+                                .requestMatchers("/api/v1/delete/reservation/{id}").hasAnyAuthority("ADMIN", "USER")
+                                .requestMatchers("/api/v1/update/reservation/{id}").hasAnyAuthority("ADMIN", "USER")
+                                .requestMatchers("/api/v1/reservation/**").permitAll()
+                                .requestMatchers("/api/v1/new/passengers").hasAnyAuthority("ADMIN", "USER")
+                                .requestMatchers("/api/v1/delete/passengers/{id}").hasAnyAuthority("ADMIN", "USER")
+                                .requestMatchers("/api/v1/update/passengers/{id}").hasAnyAuthority("ADMIN", "USER")
+                                .requestMatchers("/api/v1/passengers").permitAll()
+                                .requestMatchers("/api/v1/new/flight").hasAuthority("ADMIN")
+                                .requestMatchers("/api/v1/delete/flight/{id}").hasAnyAuthority("ADMIN", "USER")
+                                .requestMatchers("/api/v1/update/flight/{id}").hasAnyAuthority("ADMIN", "USER")
+                                .requestMatchers("/api/v1/passengers").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManager ->

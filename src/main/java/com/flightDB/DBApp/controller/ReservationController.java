@@ -22,14 +22,14 @@ public class ReservationController {
     }
 
 
-    @PostMapping(path = "/reservations")
+    @PostMapping(path = "/new/reservation")
     public ResponseEntity<Reservation> createReservation(@RequestBody Reservation reservation){
         Reservation created = reservationService.createReservation(reservation);
         return ResponseEntity.ok(created);
     }
 
 
-    @GetMapping(path = "/reservations/{id}")
+    @GetMapping(path = "/reservation/{id}")
     public ResponseEntity<Reservation> getReservationById(@PathVariable Long id){
         Optional<Reservation> reservationOpt = reservationService.getReservationById(id);
         if (reservationOpt.isPresent()) {
@@ -40,14 +40,14 @@ public class ReservationController {
     }
 
 
-    @GetMapping(path = "/reservations")
+    @GetMapping(path = "/reservation")
     public ResponseEntity<List<Reservation>> getAllReservations(){
         List<Reservation> reservations = reservationService.getAllReservations();
         return ResponseEntity.ok(reservations);
     }
 
 
-    @PutMapping(path = "/reservations/{id}")
+    @PutMapping(path = "/update/reservation/{id}")
     public ResponseEntity<Reservation> updateReservation(@PathVariable Long id, @RequestBody Reservation reservation){
         Reservation updated = reservationService.updateReservation(id, reservation);
         if (updated != null) {
@@ -58,7 +58,7 @@ public class ReservationController {
     }
 
 
-    @DeleteMapping(path = "/reservations/{id}")
+    @DeleteMapping(path = "/delete/reservation/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable Long id){
         reservationService.deleteReservation(id);
         return ResponseEntity.noContent().build();

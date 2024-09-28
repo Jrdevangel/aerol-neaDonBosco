@@ -24,7 +24,7 @@ public class RoutesController {
     }
 
 
-    @PostMapping(path = "/routes")
+    @PostMapping(path = "/new/routes")
     public ResponseEntity<Routes> createRoute(@RequestBody Routes route) {
         Routes created = routesService.createRoute(route);
         return ResponseEntity.ok(created);
@@ -49,7 +49,7 @@ public class RoutesController {
     }
 
 
-    @PutMapping(path = "/routes/{id}")
+    @PutMapping(path = "/update/routes/{id}")
     public ResponseEntity<Routes> updateRoute(@PathVariable Long id, @RequestBody Routes route) {
         Routes updated = routesService.updateRoute(id, route);
         if (updated != null) {
@@ -60,7 +60,7 @@ public class RoutesController {
     }
 
 
-    @DeleteMapping(path = "/routes/{id}")
+    @DeleteMapping(path = "/delete/routes/{id}")
     public ResponseEntity<Void> deleteRoute(@PathVariable Long id) {
         routesService.deleteRoute(id);
         return ResponseEntity.noContent().build();

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
@@ -20,6 +21,9 @@ public class Flight {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "departure_time", nullable = false)
+    private LocalDateTime departureTime;
 
     @ManyToOne(optional = true)
     @JoinColumn(name = "destination_ID", nullable = true)
