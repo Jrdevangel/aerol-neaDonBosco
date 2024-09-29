@@ -51,7 +51,7 @@ class FlightsControllerTest {
         flightList.add(flight);
 
         when(flightsService.getAllFlight()).thenReturn(flightList);
-        mockMvc.perform(get("/api/flight/")
+        mockMvc.perform(get("/api/flight/get")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
