@@ -1,14 +1,20 @@
 package com.flightDB.DBApp.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 public class Passengers {
+
+    public Passengers() {}
+
     public Passengers(Long id, int capacity, int reservedSeats) {
         this.id = id;
         this.capacity = capacity;
@@ -19,13 +25,13 @@ public class Passengers {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "Capacity")
+    @Column
     private int capacity;
 
-    @Column(name = "ReservedSeats")
+    @Column
     private int reservedSeats;
 
     @OneToMany(mappedBy = "passengers", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference(value = "passengers-reference")
+    @JsonIgnore
     private Set<Flight> flights;
 }

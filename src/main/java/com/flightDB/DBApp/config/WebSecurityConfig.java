@@ -26,8 +26,8 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(authRequest ->
                         authRequest
                                 .requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("api/flight/getAll").permitAll()
-                                .requestMatchers("/api/flight/**").permitAll()
+                                .requestMatchers("/api/flight/search").permitAll()
+                                .requestMatchers("/api/flight/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManager ->

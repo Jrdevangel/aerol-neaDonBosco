@@ -18,7 +18,7 @@ public class FlightsController {
     @Autowired
     FlightsService flightsService;
 
-    @GetMapping(path = "/getAll")
+    @GetMapping(path = "/get")
     public List<Flight> getAllFlights() {
         return flightsService.getAllFlight();
     }
