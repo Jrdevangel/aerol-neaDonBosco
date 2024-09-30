@@ -1,4 +1,6 @@
 package com.flightDB.DBApp.jwt;
+
+
 import com.flightDB.DBApp.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -26,7 +28,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException, IOException {
+            throws ServletException, IOException {
 
         final String token = getTokenFromRequest(request);
         final String username;

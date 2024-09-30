@@ -18,29 +18,33 @@ import java.util.function.Function;
 @Service
 @RequiredArgsConstructor
 public class JwtService {
+
     private static final String SECRET_KEY = "586E3272357538782F413F4428472B4B6250655368566B59703373367639792";
 
-    public String getTokenService(UserDetails user) {
-        return getToken(new HashMap<>(), user);
+    public String getTokenService(UserDetails user){
+
+        return getToken(new HashMap<>(),user);
     }
 
-    public String getToken(Map<String, Object> claims, UserDetails user) {
+    public String getToken(Map<String, Object> claims, UserDetails user){
+
         return Jwts
                 .builder()
                 .setClaims(claims)
                 .setSubject(user.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
-                .signWith(getKey(), SignatureAlgorithm.HS256)
+                .signWith(SignatureAlgorithm.HS256, getKey())
                 .compact();
     }
 
-    private Key getKey() {
+    private Key getKey(){
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String getUsernameFromToken(String token) {
+
         return getClaim(token, Claims::getSubject);
     }
 
@@ -51,9 +55,8 @@ public class JwtService {
 
     private Claims getAllClaims(String token) {
         return Jwts
-                .parserBuilder()
+                .parser()
                 .setSigningKey(getKey())
-                .build()
                 .parseClaimsJws(token)
                 .getBody();
     }

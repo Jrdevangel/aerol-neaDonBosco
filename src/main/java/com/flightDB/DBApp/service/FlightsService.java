@@ -1,13 +1,13 @@
 package com.flightDB.DBApp.service;
 
 import com.flightDB.DBApp.model.Flight;
-import com.flightDB.DBApp.model.Routes;
 import com.flightDB.DBApp.repository.IFlightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class FlightsService {

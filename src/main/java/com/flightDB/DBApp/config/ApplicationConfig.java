@@ -1,6 +1,7 @@
 package com.flightDB.DBApp.config;
 
-import com.flightDB.DBApp.repository.IUserRepository;
+
+import com.flightDB.DBApp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {
-    private final IUserRepository iUserRepository;
+    private final UserRepository userRepository;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -38,7 +39,7 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> iUserRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("No User Exist"));
+        return username -> userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("No existe el usiario"));
     }
 }
