@@ -29,4 +29,14 @@ public class UserService {
     public User getUserByUsername(String username){
         return iUserRepository.findByUsername(username).orElseThrow();
     }
+
+    public User updatePassword(String password, Long id){
+        User response = iUserRepository.findById(id).orElseThrow();
+        response.setPassword(password);
+        return iUserRepository.save(response);
+    }
+
+    public User getUserById(Long id){
+        return iUserRepository.findById(id).orElseThrow();
+    }
 }
