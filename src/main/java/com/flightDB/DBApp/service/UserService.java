@@ -1,4 +1,32 @@
 package com.flightDB.DBApp.service;
 
+import com.flightDB.DBApp.controller.UserController;
+import com.flightDB.DBApp.model.User;
+import com.flightDB.DBApp.repository.IUserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+@Service
+
 public class UserService {
+
+    @Autowired
+    IUserRepository iUserRepository;
+
+    public void deleteUser(Long Id){
+        iUserRepository.deleteById(Id);
+    }
+
+    public User updateUsername(String username, Long id){
+        Optional<User> user = iUserRepository.findById(id);
+        user.get().setUsername(username);
+
+        return iUserRepository.save(user.get());
+    }
+
+    public User getUserByUsername(String username){
+        return iUserRepository.findByUsername(username).orElseThrow();
+    }
 }
