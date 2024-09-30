@@ -28,6 +28,8 @@ public class FlightsController {
     public void deleteFlight(@PathVariable Long id) {
         flightsService.deleteFright(id);
     }
+
+
     @PutMapping(path = "/update/{id}")
     public Flight updateFlight(@PathVariable Long id, @RequestBody Flight newFlight) {
         return flightsService.updateFlight(id, newFlight);
