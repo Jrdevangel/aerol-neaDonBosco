@@ -1,5 +1,6 @@
 package com.flightDB.DBApp.controller;
 
+import com.flightDB.DBApp.model.ERole;
 import com.flightDB.DBApp.model.User;
 import com.flightDB.DBApp.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -33,5 +34,10 @@ public class UserController {
     @PutMapping(path = "/updatePassword/{id}")
     public User updatePassword(@PathVariable Long id, @RequestParam String password) {
         return userService.updatePassword(password, id);
+    }
+
+    @PutMapping(path = "/updateRole/{id}")
+    public User updateRole(@PathVariable Long id, @RequestParam ERole username) {
+        return userService.updateRole(username, id);
     }
 }
