@@ -2,7 +2,9 @@
 
 package com.flightDB.DBApp.service;
 
+import com.flightDB.DBApp.model.Passengers;
 import com.flightDB.DBApp.model.Reservation;
+import com.flightDB.DBApp.repository.IPassengersRepository;
 import com.flightDB.DBApp.repository.IReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,16 +17,26 @@ import java.util.stream.StreamSupport;
 @Service
 public class ReservationService {
 
+
     private final IReservationRepository reservationRepository;
+    private final IPassengersRepository iPassengersRepository;
 
     @Autowired
-    public ReservationService(IReservationRepository reservationRepository) {
+    public ReservationService(IReservationRepository reservationRepository, IPassengersRepository iPassengersRepository) {
         this.reservationRepository = reservationRepository;
+        this.iPassengersRepository = iPassengersRepository;
     }
 
 
-    public Reservation createReservation(Reservation reservation) {
-        return reservationRepository.save(reservation);
+    public Reservation createReservation(Reservation reservation, int passengers) {
+        Passengers responsePassengers = reservation.getFlight().getPassengers();
+        if(responsePassengers.getReservedSeats() + passengers <= responsePassengers.getCapacity()) {
+            responsePassengers.setReservedSeats(responsePassengers.getReservedSeats() + passengers);
+            iPassengersRepository.save(responsePassengers);
+            return reservationRepository.save(reservation);
+        } else {
+            throw new IllegalArgumentException("There is no available seats");
+        }
     }
 
 

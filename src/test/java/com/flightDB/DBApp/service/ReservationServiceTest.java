@@ -1,7 +1,11 @@
 package com.flightDB.DBApp.service;
 
 
+import com.flightDB.DBApp.model.Flight;
+import com.flightDB.DBApp.model.Passengers;
 import com.flightDB.DBApp.model.Reservation;
+import com.flightDB.DBApp.model.User;
+import com.flightDB.DBApp.repository.IPassengersRepository;
 import com.flightDB.DBApp.repository.IReservationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,27 +26,62 @@ class ReservationServiceTest {
     @Mock
     private IReservationRepository reservationRepository;
 
+    @Mock
+    private IPassengersRepository iPassengersRepository; // Переконайтеся, що правильно використовуєте мок
+
     @InjectMocks
     private ReservationService reservationService;
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
+        MockitoAnnotations.openMocks(this); // Ініціалізуємо мок-об'єкти перед кожним тестом
     }
 
-    // Test para crear una reserva
     @Test
-    public void testCreateReservation() {
-        Reservation reservation = new Reservation();  // Asegúrate de que tu modelo tenga un constructor vacío o usa lombok.
+    public void testCreateReservation_Success() {
+        int imputedPassengers = 5;
+
+        Flight flight = new Flight();
+        Passengers passengers = new Passengers();
+        passengers.setReservedSeats(190);
+        passengers.setCapacity(200);
+        flight.setPassengers(passengers);
+
+        Reservation reservation = new Reservation();
+        reservation.setFlight(flight);
+
+        when(iPassengersRepository.save(any(Passengers.class))).thenReturn(passengers);
         when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
 
-        Reservation createdReservation = reservationService.createReservation(reservation);
+        Reservation result = reservationService.createReservation(reservation, imputedPassengers);
 
-        assertNotNull(createdReservation); // Verifica que la reserva no es nula
-        verify(reservationRepository, times(1)).save(reservation); // Verifica que el método save fue llamado una vez
+        assertNotNull(result);
+        assertEquals(195, passengers.getReservedSeats());
+        verify(iPassengersRepository, times(1)).save(passengers);
+        verify(reservationRepository, times(1)).save(reservation);
+    }
+    @Test
+    public void testCreateReservation_Error() {
+        int passengersToReserve = 11;
+
+        Flight flight = new Flight();
+        Passengers passengers = new Passengers();
+        passengers.setReservedSeats(190);
+        passengers.setCapacity(200);
+        flight.setPassengers(passengers);
+
+        Reservation reservation = new Reservation();
+        reservation.setFlight(flight);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            reservationService.createReservation(reservation, passengersToReserve);
+        });
+
+        assertEquals("There is no available seats", exception.getMessage());
+        verify(iPassengersRepository, never()).save(any(Passengers.class));
+        verify(reservationRepository, never()).save(any(Reservation.class));
     }
 
-    // Test para obtener una reserva por ID
     @Test
     public void testGetReservationById() {
         Reservation reservation = new Reservation();  // Crea un objeto mock de reserva
