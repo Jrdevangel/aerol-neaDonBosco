@@ -15,19 +15,23 @@ import java.util.Optional;
 
 public class UserService {
 
+    //hacer test
     @Autowired
     IUserRepository iUserRepository;
 
+    //hacer test
     public void deleteUser(Long Id){
         iUserRepository.deleteById(Id);
     }
 
+    //hacer test
     public User updateUsername(String username, Long id){
         Optional<User> user = iUserRepository.findById(id);
         user.get().setUsername(username);
         return iUserRepository.save(user.get());
     }
 
+    //hacer test
     public User getUserByUsername(String username){
         return iUserRepository.findByUsername(username).orElseThrow();
     }
@@ -53,9 +57,9 @@ public class UserService {
         return iUserRepository.findById(id).orElseThrow();
     }
 
-    public User updateRole(ERole username, Long id){
+    public User updateRole(ERole role, Long id){
         User response = iUserRepository.findById(id).orElseThrow();
-        response.setRole(username);
+        response.setRole(role);
         return iUserRepository.save(response);
     }
 }
