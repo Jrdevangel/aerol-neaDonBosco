@@ -5,6 +5,7 @@ import com.flightDB.DBApp.model.ERole;
 import com.flightDB.DBApp.model.User;
 import com.flightDB.DBApp.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.management.relation.Role;
@@ -31,10 +32,21 @@ public class UserService {
         return iUserRepository.findByUsername(username).orElseThrow();
     }
 
-    public User updatePassword(String password, Long id){
-        User response = iUserRepository.findById(id).orElseThrow();
-        response.setPassword(password);
-        return iUserRepository.save(response);
+    public User updatePassword(String oldPassword, String newPassword, Long id) {
+        User user = iUserRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new RuntimeException("Old password is incorrect");
+        }
+
+        String encodedNewPassword = passwordEncoder.encode(newPassword);
+
+        user.setPassword(encodedNewPassword);
+
+        return iUserRepository.save(user);
     }
 
     public User getUserById(Long id){

@@ -32,8 +32,13 @@ public class UserController {
     }
 
     @PutMapping(path = "/updatePassword/{id}")
-    public User updatePassword(@PathVariable Long id, @RequestParam String password) {
-        return userService.updatePassword(password, id);
+    public User updatePassword(@RequestParam String oldPassword,@PathVariable Long id, @RequestParam String password) {
+        return userService.updatePassword(oldPassword,password, id);
+    }
+
+    @GetMapping(path = "/getByID")
+    public User getById(Long id) {
+        return userService.getUserById(id);
     }
 
     @PutMapping(path = "/updateRole/{id}")
