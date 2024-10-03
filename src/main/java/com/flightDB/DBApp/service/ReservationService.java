@@ -8,6 +8,7 @@ import com.flightDB.DBApp.model.Reservation;
 import com.flightDB.DBApp.repository.IFlightRepository;
 import com.flightDB.DBApp.repository.IPassengersRepository;
 import com.flightDB.DBApp.repository.IReservationRepository;
+import com.flightDB.DBApp.repository.IWalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,27 +24,35 @@ public class ReservationService {
     private final IReservationRepository reservationRepository;
     private final IPassengersRepository iPassengersRepository;
     private final IFlightRepository iFlightRepository;
+    private final IWalletRepository iWalletRepository;
 
     @Autowired
-    public ReservationService(IReservationRepository reservationRepository, IPassengersRepository iPassengersRepository, IFlightRepository iFlightRepository) {
+    public ReservationService(IReservationRepository reservationRepository, IPassengersRepository iPassengersRepository, IFlightRepository iFlightRepository, IWalletRepository iWalletRepository) {
         this.reservationRepository = reservationRepository;
         this.iPassengersRepository = iPassengersRepository;
         this.iFlightRepository = iFlightRepository;
+        this.iWalletRepository = iWalletRepository;
     }
 
 
     public Reservation createReservation(Reservation reservation) {
         Passengers responsePassengers = reservation.getFlight().getPassengers();
         if(responsePassengers.getReservedSeats() + reservation.getReservedSeats() <= responsePassengers.getCapacity()) {
-            if(responsePassengers.getReservedSeats() + reservation.getReservedSeats()  == responsePassengers.getCapacity()) {
-                Flight flight = reservation.getFlight();
-                flight.setAvailableSeat(true);
-                iFlightRepository.save(flight);
+            if(reservation.getUser().getWallet().getEuro() >= reservation.getFlight().getCostEuro()) {
+                double lessMoney = reservation.getUser().getWallet().getEuro() - reservation.getFlight().getCostEuro();
+                reservation.getUser().getWallet().setEuro(lessMoney);
+                iWalletRepository.save(reservation.getUser().getWallet());
+                if (responsePassengers.getReservedSeats() + reservation.getReservedSeats() == responsePassengers.getCapacity()) {
+                    Flight flight = reservation.getFlight();
+                    flight.setAvailableSeat(true);
+                    iFlightRepository.save(flight);
+                }
+                responsePassengers.setReservedSeats(responsePassengers.getReservedSeats() + reservation.getReservedSeats());
+                iPassengersRepository.save(responsePassengers);
+                return reservationRepository.save(reservation);
+            } else {
+                throw new IllegalArgumentException("User don't have enough money");
             }
-
-            responsePassengers.setReservedSeats(responsePassengers.getReservedSeats() + reservation.getReservedSeats());
-            iPassengersRepository.save(responsePassengers);
-            return reservationRepository.save(reservation);
         } else {
             throw new IllegalArgumentException("There is no available seats");
         }

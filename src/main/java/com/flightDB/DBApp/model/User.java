@@ -62,8 +62,13 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "user-reservation-reference")
     private Set<Reservation> reservations;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference(value = "user-wallet-reference")
+    private Wallet wallet;
 
 }

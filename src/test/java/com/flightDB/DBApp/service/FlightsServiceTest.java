@@ -42,7 +42,7 @@ class FlightsServiceTest {
         Routes origin = new Routes(1L, "Spain", "Madrid");
         Routes destination = new Routes(2L, "France", "Paris");
         Passengers passengers = new Passengers(1L, 200, 100);
-        Flight flight = new Flight(1L, null, destination, origin, passengers);
+        Flight flight = new Flight(1L, null, destination, origin, passengers, 1);
         ArrayList<Flight> flightList = new ArrayList<>();
         flightList.add(flight);
         when(iFlightRepository.findAll()).thenReturn(flightList);
@@ -68,8 +68,8 @@ class FlightsServiceTest {
         Routes origin = new Routes(1L, "Spain", "Madrid");
         Routes destination = new Routes(2L, "France", "Paris");
         Passengers passengers = new Passengers(1L, 200, 100);
-        Flight existingFlight = new Flight(1L, null, destination, origin, passengers);
-        Flight newBoeing = new Flight(1L, LocalDate.now(), destination, origin, passengers);
+        Flight existingFlight = new Flight(1L, null, destination, origin, passengers, 1);
+        Flight newBoeing = new Flight(1L, LocalDate.now(), destination, origin, passengers, 1);
 
         when(iFlightRepository.findById(1L)).thenReturn(Optional.of(existingFlight));
         when(iFlightRepository.save(newBoeing)).thenReturn(newBoeing);
@@ -90,8 +90,8 @@ class FlightsServiceTest {
         Passengers passengers = new Passengers(1L, 200, 100);
 
         List<Flight> flightList = new ArrayList<>();
-        Flight rainer = new Flight(1L, null, destination, origin, passengers);
-        Flight boeing = new Flight(2L, LocalDate.now(), destination, origin, passengers);
+        Flight rainer = new Flight(1L, null, destination, origin, passengers, 1);
+        Flight boeing = new Flight(2L, LocalDate.now(), destination, origin, passengers, 1);
 
         flightList.add(rainer);
         flightList.add(boeing);
@@ -111,8 +111,8 @@ class FlightsServiceTest {
         Passengers passengers = new Passengers(1L, 200, 100);
 
         List<Flight> flightList = new ArrayList<>();
-        Flight rainer = new Flight(1L, null, destination, origin, passengers);
-        Flight boeing = new Flight(2L, LocalDate.now(), destination, origin, passengers);
+        Flight rainer = new Flight(1L, null, destination, origin, passengers, 1);
+        Flight boeing = new Flight(2L, LocalDate.now(), destination, origin, passengers, 1);
 
         flightList.add(rainer);
         flightList.add(boeing);
@@ -131,7 +131,7 @@ class FlightsServiceTest {
         Routes origin = new Routes(1L, "Spain", "Madrid");
         Routes destination = new Routes(2L, "France", "Paris");
         Passengers passengers = new Passengers(1L, 200, 100);
-        Flight flight = new Flight(1L, null, destination, origin, passengers);
+        Flight flight = new Flight(1L, null, destination, origin, passengers, 1);
         when(iFlightRepository.save(flight)).thenReturn(flight);
 
         Flight result = flightsService.createFlight(flight);

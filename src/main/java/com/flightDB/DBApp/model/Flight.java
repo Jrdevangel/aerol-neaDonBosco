@@ -14,12 +14,13 @@ public class Flight {
 
     public Flight() {}
 
-    public Flight(Long id, LocalDate departureTime, Routes destination, Routes origin, Passengers passengers) {
+    public Flight(Long id, LocalDate departureTime, Routes destination, Routes origin, Passengers passengers, double costEuro) {
         this.id = id;
         this.departureTime = departureTime;
         this.destination = destination;
         this.origin = origin;
         this.passengers = passengers;
+        this.costEuro = costEuro;
     }
 
     @Id
@@ -45,4 +46,7 @@ public class Flight {
     @ManyToOne(optional = true)
     @JoinColumn(name = "passengers_ID", nullable = true)
     private Passengers passengers;
+
+    @Column
+    private double costEuro;
 }

@@ -1,13 +1,11 @@
 package com.flightDB.DBApp.service;
 
 
-import com.flightDB.DBApp.model.Flight;
-import com.flightDB.DBApp.model.Passengers;
-import com.flightDB.DBApp.model.Reservation;
-import com.flightDB.DBApp.model.User;
+import com.flightDB.DBApp.model.*;
 import com.flightDB.DBApp.repository.IFlightRepository;
 import com.flightDB.DBApp.repository.IPassengersRepository;
 import com.flightDB.DBApp.repository.IReservationRepository;
+import com.flightDB.DBApp.repository.IWalletRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -31,6 +29,9 @@ class ReservationServiceTest {
     private IFlightRepository iFlightRepository;
 
     @Mock
+    private IWalletRepository iWalletRepository;
+
+    @Mock
     private IPassengersRepository iPassengersRepository;
 
     @InjectMocks
@@ -42,72 +43,132 @@ class ReservationServiceTest {
     }
 
     @Test
-    public void testCreateReservation_Success_and_when_is_full_true() {
+    public void testCreateReservation_success() {
+        User user = new User();
+        user.setWallet(new Wallet());
+        user.getWallet().setEuro(10);
+
         Flight flight = new Flight();
         Passengers passengers = new Passengers();
-        passengers.setReservedSeats(190);
+        passengers.setReservedSeats(150);
         passengers.setCapacity(200);
         flight.setPassengers(passengers);
+        flight.setCostEuro(5);
 
         Reservation reservation = new Reservation();
-        reservation.setReservedSeats(10);
+        reservation.setReservedSeats(5);
         reservation.setFlight(flight);
+        reservation.setUser(user);
 
         when(iPassengersRepository.save(any(Passengers.class))).thenReturn(passengers);
         when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
+        when(iWalletRepository.save(any(Wallet.class))).thenReturn(user.getWallet());
 
         Reservation result = reservationService.createReservation(reservation);
 
         assertNotNull(result);
-        assertEquals(200, passengers.getReservedSeats());
+        assertEquals(155, passengers.getReservedSeats());
         verify(iPassengersRepository, times(1)).save(passengers);
         verify(reservationRepository, times(1)).save(reservation);
+        verify(iWalletRepository, times(1)).save(user.getWallet());
+        assertEquals(5, user.getWallet().getEuro());
     }
+
     @Test
-    public void testCreateReservation_when_is_full_true() {
+    public void testCreateReservation_success_fullFlight() {
+        User user = new User();
+        user.setWallet(new Wallet());
+        user.getWallet().setEuro(10);
+
         Flight flight = new Flight();
         Passengers passengers = new Passengers();
         passengers.setReservedSeats(190);
         passengers.setCapacity(200);
         flight.setPassengers(passengers);
+        flight.setCostEuro(5);
 
         Reservation reservation = new Reservation();
         reservation.setReservedSeats(10);
         reservation.setFlight(flight);
+        reservation.setUser(user);
 
         when(iPassengersRepository.save(any(Passengers.class))).thenReturn(passengers);
         when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
+        when(iWalletRepository.save(any(Wallet.class))).thenReturn(user.getWallet());
         when(iFlightRepository.save(any(Flight.class))).thenReturn(flight);
 
         Reservation result = reservationService.createReservation(reservation);
 
         assertNotNull(result);
         assertEquals(200, passengers.getReservedSeats());
-        assertEquals(true, result.getFlight().isAvailableSeat());
+        assertTrue(flight.isAvailableSeat());
         verify(iPassengersRepository, times(1)).save(passengers);
         verify(reservationRepository, times(1)).save(reservation);
+        verify(iFlightRepository, times(1)).save(flight);
+        verify(iWalletRepository, times(1)).save(user.getWallet());
     }
+
     @Test
-    public void testCreateReservation_Error() {
+    public void testCreateReservation_failure_notEnoughMoney() {
+        User user = new User();
+        user.setWallet(new Wallet());
+        user.getWallet().setEuro(1);
 
         Flight flight = new Flight();
         Passengers passengers = new Passengers();
-        passengers.setReservedSeats(190);
+        passengers.setReservedSeats(150);
         passengers.setCapacity(200);
         flight.setPassengers(passengers);
+        flight.setCostEuro(5);
 
         Reservation reservation = new Reservation();
-        reservation.setReservedSeats(11);
+        reservation.setReservedSeats(5);
         reservation.setFlight(flight);
+        reservation.setUser(user);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        when(iPassengersRepository.save(any(Passengers.class))).thenReturn(passengers);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            reservationService.createReservation(reservation);
+        });
+
+        assertEquals("User don't have enough money", exception.getMessage());
+        verify(iPassengersRepository, times(0)).save(any(Passengers.class));
+        verify(reservationRepository, times(0)).save(any(Reservation.class));
+    }
+
+    @Test
+    public void testCreateReservation_failure_noAvailableSeats() {
+        User user = new User();
+        user.setWallet(new Wallet());
+        user.getWallet().setEuro(10);
+
+        Flight flight = new Flight();
+        Passengers passengers = new Passengers();
+        passengers.setReservedSeats(200);
+        passengers.setCapacity(200);
+        flight.setPassengers(passengers);
+        flight.setCostEuro(5);
+
+        Reservation reservation = new Reservation();
+        reservation.setReservedSeats(5);
+        reservation.setFlight(flight);
+        reservation.setUser(user);
+
+        when(iPassengersRepository.save(any(Passengers.class))).thenReturn(passengers);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             reservationService.createReservation(reservation);
         });
 
         assertEquals("There is no available seats", exception.getMessage());
-        verify(iPassengersRepository, never()).save(any(Passengers.class));
-        verify(reservationRepository, never()).save(any(Reservation.class));
+        verify(iPassengersRepository, times(0)).save(any(Passengers.class));
+        verify(reservationRepository, times(0)).save(any(Reservation.class));
     }
+
+
+
+
 
     @Test
     public void testGetReservationById() {

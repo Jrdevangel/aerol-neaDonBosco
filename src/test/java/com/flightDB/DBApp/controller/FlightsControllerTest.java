@@ -46,7 +46,7 @@ class FlightsControllerTest {
         Routes origin = new Routes(1L, "Spain", "Madrid");
         Routes destination = new Routes(2L, "France", "Paris");
         Passengers passengers = new Passengers(1L, 200, 100);
-        Flight flight = new Flight(1L, null, destination, origin, passengers);
+        Flight flight = new Flight(1L, null, destination, origin, passengers, 1);
         ArrayList<Flight> flightList = new ArrayList<>();
         flightList.add(flight);
 
@@ -66,7 +66,7 @@ class FlightsControllerTest {
             Routes origin = new Routes(1L, "Spain", "Madrid");
             Routes destination = new Routes(2L, "France", "Paris");
             Passengers passengers = new Passengers(1L, 200, 100);
-            Flight flight = new Flight(1L, testDate, destination, origin, passengers);
+            Flight flight = new Flight(1L, testDate, destination, origin, passengers, 1);
             ArrayList<Flight> flightList = new ArrayList<>();
             flightList.add(flight);
             when(flightsService.getAllFlightBySearch(anyString(), anyString(), anyString(), anyString(), any(LocalDate.class)))
@@ -98,7 +98,7 @@ class FlightsControllerTest {
         Routes origin = new Routes(1L, "Spain", "Madrid");
         Routes destination = new Routes(2L, "France", "Paris");
         Passengers passengers = new Passengers(1L, 200, 100);
-        Flight newFlight = new Flight(flightId, testDate, destination, origin, passengers);
+        Flight newFlight = new Flight(flightId, testDate, destination, origin, passengers, 1);
         when(flightsService.updateFlight(eq(flightId), any(Flight.class))).thenReturn(newFlight);
         mockMvc.perform(put("/api/flight/update/{id}", flightId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -114,8 +114,8 @@ class FlightsControllerTest {
         Routes origin = new Routes(1L, "Spain", "Madrid");
         Routes destination = new Routes(2L, "France", "Paris");
         Passengers passengers = new Passengers(1L, 200, 100);
-        Flight newFlight = new Flight(null, departureDate, destination, origin, passengers);
-        Flight createdFlight = new Flight(1L, departureDate, destination, origin, passengers);
+        Flight newFlight = new Flight(null, departureDate, destination, origin, passengers, 1);
+        Flight createdFlight = new Flight(1L, departureDate, destination, origin, passengers, 1);
 
         when(flightsService.createFlight(any(Flight.class))).thenReturn(createdFlight);
 
