@@ -35,11 +35,11 @@ public class ReservationService {
     }
 
 
-    public Reservation createReservation(Reservation reservation) {
+    public Reservation buyReservation(Reservation reservation) {
         Passengers responsePassengers = reservation.getFlight().getPassengers();
         if(responsePassengers.getReservedSeats() + reservation.getReservedSeats() <= responsePassengers.getCapacity()) {
             if(reservation.getUser().getWallet().getEuro() >= reservation.getFlight().getCostEuro()) {
-                double lessMoney = reservation.getUser().getWallet().getEuro() - reservation.getFlight().getCostEuro();
+                double lessMoney = reservation.getUser().getWallet().getEuro() - (reservation.getFlight().getCostEuro() * reservation.getReservedSeats());
                 reservation.getUser().getWallet().setEuro(lessMoney);
                 iWalletRepository.save(reservation.getUser().getWallet());
                 if (responsePassengers.getReservedSeats() + reservation.getReservedSeats() == responsePassengers.getCapacity()) {
@@ -56,6 +56,22 @@ public class ReservationService {
         } else {
             throw new IllegalArgumentException("There is no available seats");
         }
+    }
+
+    public String returnReservation(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
+        double userSumMoney = reservation.getUser().getWallet().getEuro() + (reservation.getFlight().getCostEuro() * reservation.getReservedSeats());
+        int sumSeats = reservation.getFlight().getPassengers().getReservedSeats() - reservation.getReservedSeats();
+        reservation.getFlight().getPassengers().setReservedSeats(sumSeats);
+        if(sumSeats <= reservation.getFlight().getPassengers().getCapacity()) {
+            reservation.getFlight().setAvailableSeat(false);
+            iFlightRepository.save(reservation.getFlight());
+            iPassengersRepository.save(reservation.getFlight().getPassengers());
+            reservation.getUser().getWallet().setEuro(userSumMoney);
+            iWalletRepository.save(reservation.getUser().getWallet());
+            reservationRepository.deleteById(reservationId);
+        }
+        return "Has been returned " + userSumMoney + " euro.";
     }
 
 

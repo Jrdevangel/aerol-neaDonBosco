@@ -25,7 +25,7 @@ public class ReservationController {
 
     @PostMapping(path = "/new/reservation")
     public ResponseEntity<Reservation> createReservation(@RequestBody Reservation reservation){
-        Reservation created = reservationService.createReservation(reservation);
+        Reservation created = reservationService.buyReservation(reservation);
         return ResponseEntity.ok(created);
     }
 
@@ -59,5 +59,10 @@ public class ReservationController {
     public ResponseEntity<Void> deleteReservation(@PathVariable Long id){
         reservationService.deleteReservation(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping(path = "/return/{reservationId}")
+    public String returnReservation(@PathVariable Long reservationId) {
+        return reservationService.returnReservation(reservationId);
     }
 }

@@ -15,8 +15,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class ReservationControllerTest {
 
@@ -39,7 +39,7 @@ public class ReservationControllerTest {
         Reservation reservation = new Reservation();
         reservation.setId(1L);
         reservation.setReservedSeats(3);
-        when(reservationService.createReservation(any(Reservation.class))).thenReturn(reservation);
+        when(reservationService.buyReservation(any(Reservation.class))).thenReturn(reservation);
         ObjectMapper objectMapper = new ObjectMapper();
         String reservationJson = objectMapper.writeValueAsString(reservation);
         mockMvc.perform(post("/api/v1/new/reservation")
@@ -48,5 +48,14 @@ public class ReservationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.reservedSeats").value(3));
+    }
+
+
+    @Test
+    void returnReservation() throws Exception {
+        when(reservationService.returnReservation(1L)).thenReturn("Has been returned 50.0 euro.");
+        mockMvc.perform(put("/api/v1/return/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Has been returned 50.0 euro."));
     }
 }
