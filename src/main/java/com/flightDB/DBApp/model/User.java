@@ -65,5 +65,4 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "user-reservation-reference")
     private Set<Reservation> reservations;
-
 }
