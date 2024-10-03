@@ -17,6 +17,9 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column
+    private int reservedSeats;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "flight_ID", nullable = false)
     @JsonBackReference(value = "flight-reservation-reference")

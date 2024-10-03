@@ -29,6 +29,9 @@ public class Flight {
     @Column(nullable = true)
     private LocalDate departureTime;
 
+    @Column
+    private boolean availableSeat;
+
     @ManyToOne(optional = true)
     @JoinColumn(name = "destination_ID", nullable = true)
     @JsonIgnoreProperties({"originFlights", "destinationFlights"})

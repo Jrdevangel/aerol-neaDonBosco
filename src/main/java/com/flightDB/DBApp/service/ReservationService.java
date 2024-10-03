@@ -2,8 +2,10 @@
 
 package com.flightDB.DBApp.service;
 
+import com.flightDB.DBApp.model.Flight;
 import com.flightDB.DBApp.model.Passengers;
 import com.flightDB.DBApp.model.Reservation;
+import com.flightDB.DBApp.repository.IFlightRepository;
 import com.flightDB.DBApp.repository.IPassengersRepository;
 import com.flightDB.DBApp.repository.IReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,18 +22,26 @@ public class ReservationService {
 
     private final IReservationRepository reservationRepository;
     private final IPassengersRepository iPassengersRepository;
+    private final IFlightRepository iFlightRepository;
 
     @Autowired
-    public ReservationService(IReservationRepository reservationRepository, IPassengersRepository iPassengersRepository) {
+    public ReservationService(IReservationRepository reservationRepository, IPassengersRepository iPassengersRepository, IFlightRepository iFlightRepository) {
         this.reservationRepository = reservationRepository;
         this.iPassengersRepository = iPassengersRepository;
+        this.iFlightRepository = iFlightRepository;
     }
 
 
-    public Reservation createReservation(Reservation reservation, int passengers) {
+    public Reservation createReservation(Reservation reservation) {
         Passengers responsePassengers = reservation.getFlight().getPassengers();
-        if(responsePassengers.getReservedSeats() + passengers <= responsePassengers.getCapacity()) {
-            responsePassengers.setReservedSeats(responsePassengers.getReservedSeats() + passengers);
+        if(responsePassengers.getReservedSeats() + reservation.getReservedSeats() <= responsePassengers.getCapacity()) {
+            if(responsePassengers.getReservedSeats() + reservation.getReservedSeats()  == responsePassengers.getCapacity()) {
+                Flight flight = reservation.getFlight();
+                flight.setAvailableSeat(true);
+                iFlightRepository.save(flight);
+            }
+
+            responsePassengers.setReservedSeats(responsePassengers.getReservedSeats() + reservation.getReservedSeats());
             iPassengersRepository.save(responsePassengers);
             return reservationRepository.save(reservation);
         } else {

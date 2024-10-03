@@ -23,11 +23,11 @@ public class ReservationController {
     }
 
 
-//    @PostMapping(path = "/new/reservation")
-//    public ResponseEntity<Reservation> createReservation(@RequestBody Reservation reservation){
-//        Reservation created = reservationService.createReservation(reservation);
-//        return ResponseEntity.ok(created);
-//    }
+    @PostMapping(path = "/new/reservation")
+    public ResponseEntity<Reservation> createReservation(@RequestBody Reservation reservation){
+        Reservation created = reservationService.createReservation(reservation);
+        return ResponseEntity.ok(created);
+    }
 
 
     @GetMapping(path = "/reservation/{id}")
