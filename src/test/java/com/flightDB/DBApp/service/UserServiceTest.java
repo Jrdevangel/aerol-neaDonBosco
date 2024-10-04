@@ -42,15 +42,6 @@ class UserServiceTest {
     }
 
     @Test
-    void updateUsername() {
-    }
-
-    @Test
-    void getUserByUsername() {
-    }
-
-
-    @Test
     void updatePassword_ShouldUpdatePassword_WhenOldPasswordIsCorrect() {
         Long userId = 1L;
         String oldPassword = "oldPassword";
@@ -145,5 +136,25 @@ class UserServiceTest {
         when(iUserRepository.save(flight)).thenReturn(flight);
         User response = userService.updateRole(newErole, 1L);
         assertEquals(newErole, response.getRole());
+    }
+
+    @Test
+    void updateUsername() {
+        ERole eRole = ERole.USER;
+        User flight = new User();
+        flight.setId(1L);
+        flight.setUsername("Angel");
+        flight.setPassword("1234");
+        flight.setEmail("angel@gmail.com");
+        flight.setRole(eRole);
+
+        when(iUserRepository.save(flight)).thenReturn(flight);
+        when(iUserRepository.findById(1L)).thenReturn(Optional.of(flight));
+        User response = userService.updateUsername("Maksym", 1L);
+        assertEquals("Maksym", response.getUsername());
+    }
+
+    @Test
+    void getUserByUsername() {
     }
 }
