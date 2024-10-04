@@ -3,31 +3,23 @@ package com.flightDB.DBApp.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Blob;
 import java.time.LocalDate;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 public class Flight {
-
-    public Flight() {}
-
-    public Flight(Long id, LocalDate departureTime, Routes destination, Routes origin, Passengers passengers, double costEuro) {
-        this.id = id;
-        this.departureTime = departureTime;
-        this.destination = destination;
-        this.origin = origin;
-        this.passengers = passengers;
-        this.costEuro = costEuro;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private LocalDate departureTime;
 
     @Column
@@ -47,6 +39,18 @@ public class Flight {
     @JoinColumn(name = "passengers_ID", nullable = true)
     private Passengers passengers;
 
-    @Column
+    @Column(nullable = false)
     private double costEuro;
+
+    @Column
+    private Blob photo;
+
+    public Flight(Long id, LocalDate departureTime, Routes destination, Routes origin, Passengers passengers, double costEuro) {
+        this.id = id;
+        this.departureTime = departureTime;
+        this.destination = destination;
+        this.origin = origin;
+        this.passengers = passengers;
+        this.costEuro = costEuro;
+    }
 }

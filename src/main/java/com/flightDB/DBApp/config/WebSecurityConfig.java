@@ -33,6 +33,8 @@ public class WebSecurityConfig {
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/flight/search",
+                                "/api/v1/new/reservation",
+                                "/api/wallet/user/{userId}",
                                 "/api/test/all"
                         ).permitAll()
                         .requestMatchers(
@@ -52,7 +54,6 @@ public class WebSecurityConfig {
                                 "/api/test/user",
                                 "/api/test/admin",
                                 "/api/v1/routes/**",
-                                "/api/v1/new/reservation",
                                 "/api/v1/update/reservation/{id}",
                                 "/api/v1/delete/reservation/{id}",
                                 "/api/v1/reservation/**",

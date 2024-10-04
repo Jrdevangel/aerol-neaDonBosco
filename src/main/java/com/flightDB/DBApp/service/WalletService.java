@@ -26,4 +26,7 @@ public class WalletService {
         wallet.setEuro(sum);
         return iWalletRepository.save(wallet);
     }
+    public Wallet getByUserId(Long userId) {
+        return iWalletRepository.findByUserId(userId).orElseThrow();
+    }
 }

@@ -5,10 +5,8 @@ package com.flightDB.DBApp.service;
 import com.flightDB.DBApp.model.Flight;
 import com.flightDB.DBApp.model.Passengers;
 import com.flightDB.DBApp.model.Reservation;
-import com.flightDB.DBApp.repository.IFlightRepository;
-import com.flightDB.DBApp.repository.IPassengersRepository;
-import com.flightDB.DBApp.repository.IReservationRepository;
-import com.flightDB.DBApp.repository.IWalletRepository;
+import com.flightDB.DBApp.model.User;
+import com.flightDB.DBApp.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,38 +23,52 @@ public class ReservationService {
     private final IPassengersRepository iPassengersRepository;
     private final IFlightRepository iFlightRepository;
     private final IWalletRepository iWalletRepository;
+    private final IUserRepository iUserRepository;
 
     @Autowired
-    public ReservationService(IReservationRepository reservationRepository, IPassengersRepository iPassengersRepository, IFlightRepository iFlightRepository, IWalletRepository iWalletRepository) {
+    public ReservationService(IReservationRepository reservationRepository, IPassengersRepository iPassengersRepository, IFlightRepository iFlightRepository, IWalletRepository iWalletRepository, IUserRepository iUserRepository) {
         this.reservationRepository = reservationRepository;
         this.iPassengersRepository = iPassengersRepository;
         this.iFlightRepository = iFlightRepository;
         this.iWalletRepository = iWalletRepository;
+        this.iUserRepository = iUserRepository;
     }
 
 
     public Reservation buyReservation(Reservation reservation) {
-        Passengers responsePassengers = reservation.getFlight().getPassengers();
-        if(responsePassengers.getReservedSeats() + reservation.getReservedSeats() <= responsePassengers.getCapacity()) {
-            if(reservation.getUser().getWallet().getEuro() >= reservation.getFlight().getCostEuro()) {
-                double lessMoney = reservation.getUser().getWallet().getEuro() - (reservation.getFlight().getCostEuro() * reservation.getReservedSeats());
-                reservation.getUser().getWallet().setEuro(lessMoney);
-                iWalletRepository.save(reservation.getUser().getWallet());
+        User user = iUserRepository.findById(reservation.getUser().getId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        Flight flight = iFlightRepository.findById(reservation.getFlight().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Flight not found"));
+
+        Passengers responsePassengers = flight.getPassengers();
+
+        if (responsePassengers.getReservedSeats() + reservation.getReservedSeats() <= responsePassengers.getCapacity()) {
+            if (user.getWallet().getEuro() >= flight.getCostEuro() * reservation.getReservedSeats()) {
+                double lessMoney = user.getWallet().getEuro() - (flight.getCostEuro() * reservation.getReservedSeats());
+                user.getWallet().setEuro(lessMoney);
+                iWalletRepository.save(user.getWallet());
+
                 if (responsePassengers.getReservedSeats() + reservation.getReservedSeats() == responsePassengers.getCapacity()) {
-                    Flight flight = reservation.getFlight();
                     flight.setAvailableSeat(true);
                     iFlightRepository.save(flight);
                 }
+
                 responsePassengers.setReservedSeats(responsePassengers.getReservedSeats() + reservation.getReservedSeats());
                 iPassengersRepository.save(responsePassengers);
+
+                reservation.setUser(user);
+                reservation.setFlight(flight);
                 return reservationRepository.save(reservation);
             } else {
-                throw new IllegalArgumentException("User don't have enough money");
+                throw new IllegalArgumentException("User doesn't have enough money");
             }
         } else {
-            throw new IllegalArgumentException("There is no available seats");
+            throw new IllegalArgumentException("There are no available seats");
         }
     }
+
 
     public String returnReservation(Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
@@ -81,7 +93,6 @@ public class ReservationService {
             Reservation existingReservation = existingReservationOpt.get();
             existingReservation.setFlight(reservation.getFlight());
             existingReservation.setUser(reservation.getUser());
-            // Update other fields if there are any
             return reservationRepository.save(existingReservation);
         } else {
             return null;

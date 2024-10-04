@@ -4,6 +4,7 @@ package com.flightDB.DBApp.controller;
 import com.flightDB.DBApp.model.Reservation;
 import com.flightDB.DBApp.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,10 +25,19 @@ public class ReservationController {
 
 
     @PostMapping(path = "/new/reservation")
-    public ResponseEntity<Reservation> createReservation(@RequestBody Reservation reservation){
-        Reservation created = reservationService.buyReservation(reservation);
-        return ResponseEntity.ok(created);
+    public ResponseEntity<Reservation> createReservation(@RequestBody Reservation reservation) {
+        try {
+            Reservation created = reservationService.buyReservation(reservation);
+            return ResponseEntity.ok(created);
+        } catch (IllegalArgumentException e) {
+            // Логування помилки
+            return ResponseEntity.badRequest().body(null);
+        } catch (Exception e) {
+            // Логування помилки
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
+
 
 
     @GetMapping(path = "/reservation/{id}")

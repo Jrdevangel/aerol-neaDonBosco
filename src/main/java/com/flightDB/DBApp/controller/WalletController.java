@@ -20,4 +20,8 @@ public class WalletController {
     public Wallet createWallet(@PathVariable Long id) {
         return walletService.createWallet(id);
     }
+    @GetMapping(path = "/user/{userId}")
+    public Wallet getByUserId(@PathVariable Long userId) {
+        return walletService.getByUserId(userId);
+    }
 }

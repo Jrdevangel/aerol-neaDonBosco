@@ -23,23 +23,22 @@ public class Routes {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonProperty("id")  // Incluir en la serialización/deserialización
+    @JsonProperty("id")
     private Long id;
 
     @Column
-    @JsonProperty("country")  // Incluir en la serialización/deserialización
+    @JsonProperty("country")
     private String country;
 
     @Column
-    @JsonProperty("city")  // Incluir en la serialización/deserialización
+    @JsonProperty("city")
     private String city;
 
-    // Ignorar estas relaciones en la serialización y deserialización
     @OneToMany(mappedBy = "destination", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore  // Ignorar en la serialización
+    @JsonIgnore
     private Set<Flight> destinationFlights;
 
     @OneToMany(mappedBy = "origin", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore  // Ignorar en la serialización
+    @JsonIgnore
     private Set<Flight> originFlights;
 }
