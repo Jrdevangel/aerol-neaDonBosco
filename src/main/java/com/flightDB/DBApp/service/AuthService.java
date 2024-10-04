@@ -4,6 +4,7 @@ package com.flightDB.DBApp.service;
 import com.flightDB.DBApp.dtos.request.LoginRequest;
 import com.flightDB.DBApp.dtos.request.RegisterRequest;
 import com.flightDB.DBApp.dtos.response.AuthResponse;
+import com.flightDB.DBApp.model.ERole;
 import com.flightDB.DBApp.model.User;
 import com.flightDB.DBApp.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,11 +38,13 @@ public class AuthService {
     }
 
     public AuthResponse register(RegisterRequest register) {
+        ERole role = (register.getRole() != null) ? register.getRole() : ERole.USER;
+
         User user = User.builder()
                 .username(register.getUsername())
                 .email(register.getEmail())
                 .password(passwordEncoder.encode(register.getPassword()))
-                .role(register.getRole())
+                .role(role)
                 .build();
 
         IUserRepository.save(user);
