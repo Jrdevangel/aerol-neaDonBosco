@@ -5,12 +5,14 @@ import com.flightDB.DBApp.model.User;
 import com.flightDB.DBApp.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
-
 public class UserController {
 
     @Autowired
@@ -26,6 +28,19 @@ public class UserController {
         return userService.updateUsername(username, id);
     }
 
+    @GetMapping
+    public ResponseEntity<?> getUserProfile() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username);
+
+        if (user != null) {
+            return ResponseEntity.ok().body(user);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @GetMapping(path = "/getUsername")
     public User getUsername(@RequestParam String username) {
         return userService.getUserByUsername(username);
@@ -37,12 +52,12 @@ public class UserController {
     }
 
     @GetMapping(path = "/getByID")
-    public User getById(Long id) {
+    public User getById(@RequestParam Long id) {
         return userService.getUserById(id);
     }
 
     @PutMapping(path = "/updateRole/{id}")
-    public User updateRole(@PathVariable Long id, @RequestParam ERole username) {
-        return userService.updateRole(username, id);
+    public User updateRole(@PathVariable Long id, @RequestParam ERole role) {
+        return userService.updateRole(role, id);
     }
 }

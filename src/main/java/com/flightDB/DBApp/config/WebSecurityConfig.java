@@ -10,6 +10,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -22,27 +27,27 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Deshabilitar CSRF para APIs RESTful que utilizan tokens
                 .csrf(csrf -> csrf.disable())
-
-                // Configuración de autorización de solicitudes
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        // Rutas públicas
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/flight/search",
                                 "/api/test/all"
                         ).permitAll()
-
-                        // Rutas accesibles para usuarios con rol ADMIN
+                        .requestMatchers(
+                                "/api/user/delete",
+                                "/api/user/updateUsername",
+                                "/api/user/updatePassword",
+                                "/api/user/getByID/**"
+                        ).hasAnyAuthority("ROLE_USER")
+                        .requestMatchers("/api/user").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
                         .requestMatchers(
                                 "/api/flight/**",
                                 "/api/v1/new/routes",
                                 "/api/v1/update/routes/{id}",
                                 "/api/v1/delete/routes/{id}"
                         ).hasRole("ADMIN")
-
-                        // Rutas accesibles para usuarios con autoridad ADMIN o USER
                         .requestMatchers(
                                 "/api/test/user",
                                 "/api/test/admin",
@@ -56,28 +61,28 @@ public class WebSecurityConfig {
                                 "/api/v1/delete/passengers/{id}",
                                 "/api/v1/delete/flight/{id}",
                                 "/api/v1/update/flight/{id}"
-                        ).hasAnyAuthority("ROLE_ADMIN", "ROLE_USER") // Asegúrate de que las autoridades tengan el prefijo "ROLE_"
-
-                        // Rutas permitidas para cualquier usuario autenticado
-                        .requestMatchers(
-                                "/api/v1/passengers/**"
                         ).hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
-
-                        // Cualquier otra solicitud requiere autenticación
+                        .requestMatchers("/api/v1/passengers/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
                         .anyRequest().authenticated()
                 )
-
-                // Configuración de gestión de sesiones sin estado (JWT)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
-                // Configuración del proveedor de autenticación
                 .authenticationProvider(authenticationProvider)
-
-                // Añadir el filtro JWT antes del filtro de autenticación de usuario y contraseña
                 .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
