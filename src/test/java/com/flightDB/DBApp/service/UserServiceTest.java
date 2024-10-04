@@ -1,5 +1,6 @@
 package com.flightDB.DBApp.service;
 
+import com.flightDB.DBApp.model.ERole;
 import com.flightDB.DBApp.model.User;
 import com.flightDB.DBApp.repository.IFlightRepository;
 import com.flightDB.DBApp.repository.IUserRepository;
@@ -14,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 
+import javax.management.relation.Role;
 import java.util.Optional;
 import static org.mockito.Mockito.when;
 
@@ -38,15 +40,6 @@ class UserServiceTest {
     @Test
     void deleteUser() {
     }
-
-    @Test
-    void updateUsername() {
-    }
-
-    @Test
-    void getUserByUsername() {
-    }
-
 
     @Test
     void updatePassword_ShouldUpdatePassword_WhenOldPasswordIsCorrect() {
@@ -115,9 +108,53 @@ class UserServiceTest {
 
     @Test
     void getUserById() {
+        ERole eRole = ERole.USER;
+        User flight = new User();
+        flight.setId(1L);
+        flight.setUsername("Angel");
+        flight.setPassword("1234");
+        flight.setEmail("angel@gmail.com");
+        flight.setRole(eRole);
+
+        when(iUserRepository.findById(1L)).thenReturn(Optional.of(flight));
+        User response = userService.getUserById(1L);
+        assertEquals(1L, response.getId());
     }
 
     @Test
     void updateRole() {
+        ERole eRole = ERole.USER;
+        ERole newErole = ERole.ADMIN;
+        User flight = new User();
+        flight.setId(1L);
+        flight.setUsername("Angel");
+        flight.setPassword("1234");
+        flight.setEmail("angel@gmail.com");
+        flight.setRole(eRole);
+        when(iUserRepository.findById(1L)).thenReturn(Optional.of(flight));
+
+        when(iUserRepository.save(flight)).thenReturn(flight);
+        User response = userService.updateRole(newErole, 1L);
+        assertEquals(newErole, response.getRole());
+    }
+
+    @Test
+    void updateUsername() {
+        ERole eRole = ERole.USER;
+        User flight = new User();
+        flight.setId(1L);
+        flight.setUsername("Angel");
+        flight.setPassword("1234");
+        flight.setEmail("angel@gmail.com");
+        flight.setRole(eRole);
+
+        when(iUserRepository.save(flight)).thenReturn(flight);
+        when(iUserRepository.findById(1L)).thenReturn(Optional.of(flight));
+        User response = userService.updateUsername("Maksym", 1L);
+        assertEquals("Maksym", response.getUsername());
+    }
+
+    @Test
+    void getUserByUsername() {
     }
 }
