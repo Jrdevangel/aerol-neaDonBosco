@@ -5,7 +5,7 @@ import com.flightDB.DBApp.dtos.request.LoginRequest;
 import com.flightDB.DBApp.dtos.request.RegisterRequest;
 import com.flightDB.DBApp.dtos.response.AuthResponse;
 import com.flightDB.DBApp.model.User;
-import com.flightDB.DBApp.repository.UserRepository;
+import com.flightDB.DBApp.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final JwtService jwtService;
-    private final UserRepository userRepository;
+    private final IUserRepository IUserRepository;
     private final PasswordEncoder passwordEncoder;
 
     private final AuthenticationManager authenticationManager;
@@ -26,7 +26,7 @@ public class AuthService {
     public AuthResponse login(LoginRequest login) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword()));
 
-        UserDetails user = userRepository.findByUsername(login.getUsername()).orElseThrow();
+        UserDetails user = IUserRepository.findByUsername(login.getUsername()).orElseThrow();
 
         String token = jwtService.getTokenService(user);
 
@@ -44,7 +44,7 @@ public class AuthService {
                 .role(register.getRole())
                 .build();
 
-        userRepository.save(user);
+        IUserRepository.save(user);
 
         return AuthResponse
                 .builder()
