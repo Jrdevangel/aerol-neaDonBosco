@@ -51,7 +51,7 @@ public class ReservationService {
                 iWalletRepository.save(user.getWallet());
 
                 if (responsePassengers.getReservedSeats() + reservation.getReservedSeats() == responsePassengers.getCapacity()) {
-                    flight.setAvailableSeat(true);
+                    flight.setAvailableSeat(false);
                     iFlightRepository.save(flight);
                 }
 
@@ -76,7 +76,7 @@ public class ReservationService {
         int sumSeats = reservation.getFlight().getPassengers().getReservedSeats() - reservation.getReservedSeats();
         reservation.getFlight().getPassengers().setReservedSeats(sumSeats);
         if(sumSeats <= reservation.getFlight().getPassengers().getCapacity()) {
-            reservation.getFlight().setAvailableSeat(false);
+            reservation.getFlight().setAvailableSeat(true);
             iFlightRepository.save(reservation.getFlight());
             iPassengersRepository.save(reservation.getFlight().getPassengers());
             reservation.getUser().getWallet().setEuro(userSumMoney);
@@ -113,5 +113,9 @@ public class ReservationService {
 
     public void deleteReservation(Long id) {
         reservationRepository.deleteById(id);
+    }
+
+    public List<Reservation> getAllReservationByUserId(Long userId) {
+        return reservationRepository.findByUserId(userId);
     }
 }

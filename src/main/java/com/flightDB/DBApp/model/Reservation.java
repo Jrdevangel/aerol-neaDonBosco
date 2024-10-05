@@ -22,7 +22,7 @@ public class Reservation {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "flight_ID", nullable = false)
-    @JsonBackReference(value = "flight-reservation-reference")
+//    @JsonBackReference(value = "flight-reservation-reference")
     private Flight flight;
 
     @ManyToOne(optional = false)

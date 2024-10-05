@@ -1,5 +1,6 @@
 package com.flightDB.DBApp.service;
 
+import com.flightDB.DBApp.model.User;
 import com.flightDB.DBApp.model.Wallet;
 import com.flightDB.DBApp.repository.IWalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,13 +12,18 @@ public class WalletService {
     @Autowired
     IWalletRepository iWalletRepository;
 
+    @Autowired
+    UserService userService;
+
     public Wallet getById(Long id) {
         return iWalletRepository.findById(id).orElseThrow();
     }
 
     public Wallet createWallet(Long id) {
+        User response = userService.getUserById(id);
         Wallet wallet = new Wallet();
-        wallet.setId(id);
+        wallet.setEuro(0);
+        wallet.setUser(response);
         return iWalletRepository.save(wallet);
     }
     public Wallet addEuro(Long id, double euro) {

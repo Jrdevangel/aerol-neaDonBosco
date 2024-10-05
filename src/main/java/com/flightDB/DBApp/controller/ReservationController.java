@@ -30,10 +30,8 @@ public class ReservationController {
             Reservation created = reservationService.buyReservation(reservation);
             return ResponseEntity.ok(created);
         } catch (IllegalArgumentException e) {
-            // Логування помилки
             return ResponseEntity.badRequest().body(null);
         } catch (Exception e) {
-            // Логування помилки
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -74,5 +72,10 @@ public class ReservationController {
     @PutMapping(path = "/return/{reservationId}")
     public String returnReservation(@PathVariable Long reservationId) {
         return reservationService.returnReservation(reservationId);
+    }
+
+    @GetMapping(path = "/reservation/user/{userId}")
+    public List<Reservation> getAllReservationByUserId(@PathVariable Long userId) {
+        return reservationService.getAllReservationByUserId(userId);
     }
 }
