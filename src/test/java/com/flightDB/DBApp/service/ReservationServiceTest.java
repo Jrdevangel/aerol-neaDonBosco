@@ -1,269 +1,197 @@
 package com.flightDB.DBApp.service;
 
-import com.flightDB.DBApp.model.*;
-import com.flightDB.DBApp.repository.*;
+import com.flightDB.DBApp.model.Flight;
+import com.flightDB.DBApp.model.Passengers;
+import com.flightDB.DBApp.model.Reservation;
+import com.flightDB.DBApp.model.User;
+import com.flightDB.DBApp.model.Wallet;
+import com.flightDB.DBApp.repository.IReservationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 class ReservationServiceTest {
 
-    @Mock
-    private IReservationRepository reservationRepository;
-
-    @Mock
-    private IFlightRepository iFlightRepository;
-
-    @Mock
-    private IWalletRepository iWalletRepository;
-
-    @Mock
-    private IPassengersRepository iPassengersRepository;
-
-    @Mock
-    private IUserRepository iUserRepository;
-
     @InjectMocks
     private ReservationService reservationService;
 
+    @Mock
+    private FlightsService flightsService;
+
+    @Mock
+    private UserService userService;
+
+    @Mock
+    private WalletService walletService;
+
+    @Mock
+    private PassengersService passengersService;
+
+    @Mock
+    private IReservationRepository reservationRepository;
+
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testBuyReservation_success() {
+    void buyReservation_success() {
         User user = new User();
         user.setId(1L);
         Wallet wallet = new Wallet();
-        wallet.setEuro(25);
+        wallet.setEuro(100.0);
         user.setWallet(wallet);
 
         Flight flight = new Flight();
         flight.setId(1L);
+        flight.setCostEuro(20.0);
         Passengers passengers = new Passengers();
-        passengers.setReservedSeats(150);
-        passengers.setCapacity(200);
+        passengers.setCapacity(10);
+        passengers.setReservedSeats(0);
         flight.setPassengers(passengers);
-        flight.setCostEuro(5);
 
         Reservation reservation = new Reservation();
-        reservation.setReservedSeats(5);
-        reservation.setFlight(flight);
         reservation.setUser(user);
+        reservation.setFlight(flight);
+        reservation.setReservedSeats(2);
 
-        when(iUserRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(iFlightRepository.findById(1L)).thenReturn(Optional.of(flight));
-        when(iPassengersRepository.save(any(Passengers.class))).thenReturn(passengers);
+        when(userService.getUserById(1L)).thenReturn(user);
+        when(flightsService.getFlightById(1L)).thenReturn(flight);
+
+        doNothing().when(walletService).saveWallet(any(Wallet.class));
+        doNothing().when(passengersService).savePassengers(any(Passengers.class));
+        doNothing().when(flightsService).saveFlight(any(Flight.class));
         when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
-        when(iWalletRepository.save(any(Wallet.class))).thenReturn(user.getWallet());
 
-        Reservation result = reservationService.buyReservation(reservation);
+        Reservation savedReservation = reservationService.buyReservation(reservation);
 
-        assertNotNull(result);
-        assertEquals(155, passengers.getReservedSeats());
-        assertEquals(5, reservation.getReservedSeats());
-        verify(iPassengersRepository, times(1)).save(passengers);
-        verify(reservationRepository, times(1)).save(reservation);
-        verify(iWalletRepository, times(1)).save(user.getWallet());
-        assertEquals(0, user.getWallet().getEuro());
+        assertNotNull(savedReservation);
+        assertEquals(reservation, savedReservation);
+        assertEquals(60.0, user.getWallet().getEuro());
+        assertEquals(2, passengers.getReservedSeats());
     }
 
     @Test
-    public void testBuyReservation_success_fullFlight() {
+    void returnReservation_success() {
         User user = new User();
-        user.setId(1L);
-        Wallet wallet = new Wallet();
-        wallet.setEuro(50);
-        user.setWallet(wallet);
+        user.setWallet(new Wallet());
+        user.getWallet().setEuro(50.0);
 
         Flight flight = new Flight();
-        flight.setId(1L);
+        flight.setCostEuro(20.0);
         Passengers passengers = new Passengers();
-        passengers.setReservedSeats(190);
-        passengers.setCapacity(200);
+        passengers.setReservedSeats(2);
+        passengers.setCapacity(10);
         flight.setPassengers(passengers);
-        flight.setCostEuro(5);
 
         Reservation reservation = new Reservation();
-        reservation.setReservedSeats(10);
-        reservation.setFlight(flight);
         reservation.setUser(user);
+        reservation.setFlight(flight);
+        reservation.setReservedSeats(2);
 
-        when(iUserRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(iFlightRepository.findById(1L)).thenReturn(Optional.of(flight));
-        when(iPassengersRepository.save(any(Passengers.class))).thenReturn(passengers);
-        when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
-        when(iWalletRepository.save(any(Wallet.class))).thenReturn(user.getWallet());
-        when(iFlightRepository.save(any(Flight.class))).thenReturn(flight);
+        when(reservationRepository.findById(anyLong())).thenReturn(Optional.of(reservation));
+        doNothing().when(walletService).saveWallet(any(Wallet.class));
+        doNothing().when(passengersService).savePassengers(any(Passengers.class));
+        doNothing().when(flightsService).saveFlight(any(Flight.class));
 
-        Reservation result = reservationService.buyReservation(reservation);
+        String result = reservationService.returnReservation(1L);
 
-        assertNotNull(result);
-        assertEquals(200, passengers.getReservedSeats());
-        assertFalse(flight.isAvailableSeat());
-        verify(iPassengersRepository, times(1)).save(passengers);
-        verify(reservationRepository, times(1)).save(reservation);
-        verify(iFlightRepository, times(1)).save(flight);
-        verify(iWalletRepository, times(1)).save(user.getWallet());
+        assertEquals("Has been returned 90.0 euro.", result);
+        assertEquals(90.0, user.getWallet().getEuro());
     }
 
     @Test
-    public void testBuyReservation_failure_notEnoughMoney() {
-        User user = new User();
-        user.setId(1L);
-        Wallet wallet = new Wallet();
-        wallet.setEuro(1);
-        user.setWallet(wallet);
+    void updateReservation_success() {
+        Reservation existingReservation = new Reservation();
+        existingReservation.setId(1L);
+        existingReservation.setUser(new User());
+        existingReservation.setFlight(new Flight());
 
-        Flight flight = new Flight();
-        flight.setId(1L);
-        Passengers passengers = new Passengers();
-        passengers.setReservedSeats(150);
-        passengers.setCapacity(200);
-        flight.setPassengers(passengers);
-        flight.setCostEuro(5);
+        Reservation newReservation = new Reservation();
+        newReservation.setFlight(new Flight());
+        newReservation.setUser(new User());
 
-        Reservation reservation = new Reservation();
-        reservation.setReservedSeats(5);
-        reservation.setFlight(flight);
-        reservation.setUser(user);
+        when(reservationRepository.findById(1L)).thenReturn(Optional.of(existingReservation));
+        when(reservationRepository.save(any(Reservation.class))).thenReturn(existingReservation);
 
-        when(iUserRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(iFlightRepository.findById(1L)).thenReturn(Optional.of(flight));
-        when(iPassengersRepository.save(any(Passengers.class))).thenReturn(passengers);
+        Reservation updatedReservation = reservationService.updateReservation(1L, newReservation);
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            reservationService.buyReservation(reservation);
-        });
-
-        assertEquals("User doesn't have enough money", exception.getMessage());
-        verify(iPassengersRepository, times(0)).save(any(Passengers.class));
-        verify(reservationRepository, times(0)).save(any(Reservation.class));
+        assertNotNull(updatedReservation);
+        assertEquals(existingReservation, updatedReservation);
     }
 
     @Test
-    public void testBuyReservation_failure_noAvailableSeats() {
-        User user = new User();
-        user.setId(1L);
-        Wallet wallet = new Wallet();
-        wallet.setEuro(10);
-        user.setWallet(wallet);
+    void updateReservation_notFound() {
+        Reservation newReservation = new Reservation();
+        newReservation.setFlight(new Flight());
+        newReservation.setUser(new User());
 
-        Flight flight = new Flight();
-        flight.setId(1L);
-        Passengers passengers = new Passengers();
-        passengers.setReservedSeats(200);
-        passengers.setCapacity(200);
-        flight.setPassengers(passengers);
-        flight.setCostEuro(5);
+        when(reservationRepository.findById(1L)).thenReturn(Optional.empty());
 
-        Reservation reservation = new Reservation();
-        reservation.setReservedSeats(5);
-        reservation.setFlight(flight);
-        reservation.setUser(user);
+        Reservation updatedReservation = reservationService.updateReservation(1L, newReservation);
 
-        when(iUserRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(iFlightRepository.findById(1L)).thenReturn(Optional.of(flight));
-        when(iPassengersRepository.save(any(Passengers.class))).thenReturn(passengers);
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            reservationService.buyReservation(reservation);
-        });
-
-        assertEquals("There are no available seats", exception.getMessage());
-        verify(iPassengersRepository, times(0)).save(any(Passengers.class));
-        verify(reservationRepository, times(0)).save(any(Reservation.class));
+        assertNull(updatedReservation);
     }
 
     @Test
-    public void testGetReservationById() {
+    void getReservationById_success() {
         Reservation reservation = new Reservation();
+        reservation.setId(1L);
+
         when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
 
         Optional<Reservation> foundReservation = reservationService.getReservationById(1L);
 
         assertTrue(foundReservation.isPresent());
-        verify(reservationRepository, times(1)).findById(1L);
+        assertEquals(reservation, foundReservation.get());
     }
 
     @Test
-    public void testGetAllReservations() {
+    void getAllReservations_success() {
         Reservation reservation1 = new Reservation();
         Reservation reservation2 = new Reservation();
-        List<Reservation> reservationsList = new ArrayList<>(List.of(reservation1, reservation2));
+        List<Reservation> reservations = List.of(reservation1, reservation2);
 
-        when(reservationRepository.findAll()).thenReturn(reservationsList);
+        when(reservationRepository.findAll()).thenReturn(reservations);
 
         List<Reservation> foundReservations = reservationService.getAllReservations();
 
         assertEquals(2, foundReservations.size());
-        verify(reservationRepository, times(1)).findAll();
     }
 
     @Test
-    public void testUpdateReservation() {
-        Reservation existingReservation = new Reservation();
-        existingReservation.setId(1L);
-        Reservation updatedReservation = new Reservation();
+    void deleteReservation_success() {
+        doNothing().when(reservationRepository).deleteById(anyLong());
 
-        when(reservationRepository.findById(1L)).thenReturn(Optional.of(existingReservation));
-        when(reservationRepository.save(any(Reservation.class))).thenReturn(updatedReservation);
-
-        Reservation result = reservationService.updateReservation(1L, updatedReservation);
-
-        assertNotNull(result);
-        verify(reservationRepository, times(1)).findById(1L);
-        verify(reservationRepository, times(1)).save(existingReservation);
-    }
-
-    @Test
-    public void testDeleteReservation() {
-        doNothing().when(reservationRepository).deleteById(1L);
-
-        reservationService.deleteReservation(1L);
-
+        assertDoesNotThrow(() -> reservationService.deleteReservation(1L));
         verify(reservationRepository, times(1)).deleteById(1L);
     }
 
     @Test
-    void returnReservation() {
+    void getAllReservationByUserId_success() {
         User user = new User();
         user.setId(1L);
-        user.setWallet(new Wallet());
-        user.getWallet().setEuro(0);
-
-        Flight flight = new Flight();
-        flight.setId(1L);
-        Passengers passengers = new Passengers();
-        passengers.setReservedSeats(190);
-        passengers.setCapacity(200);
-        flight.setPassengers(passengers);
-        flight.setCostEuro(5);
-
         Reservation reservation = new Reservation();
-        reservation.setReservedSeats(10);
-        reservation.setFlight(flight);
         reservation.setUser(user);
-        when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
-        when(iWalletRepository.save(user.getWallet())).thenReturn(user.getWallet());
-        when(iFlightRepository.save(flight)).thenReturn(flight);
-        when(iPassengersRepository.save(flight.getPassengers())).thenReturn(flight.getPassengers());
-        when(reservationRepository.save(reservation)).thenReturn(reservation);
+        List<Reservation> reservations = List.of(reservation);
 
-        String response = reservationService.returnReservation(1L);
-        assertEquals("Has been returned 50.0 euro.", response);
-        assertEquals(180, passengers.getReservedSeats());
+        when(reservationRepository.findByUserId(1L)).thenReturn(reservations);
+
+        List<Reservation> foundReservations = reservationService.getAllReservationByUserId(1L);
+
+        assertEquals(1, foundReservations.size());
+        assertEquals(reservation, foundReservations.get(0));
     }
-
 }

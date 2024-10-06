@@ -1,4 +1,5 @@
 package com.flightDB.DBApp.controller;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flightDB.DBApp.model.Flight;
 import com.flightDB.DBApp.model.Passengers;
@@ -14,13 +15,16 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.mockito.Mockito.when;
+
 class FlightsControllerTest {
 
     private MockMvc mockMvc;
@@ -60,31 +64,32 @@ class FlightsControllerTest {
         verify(flightsService, times(1)).getAllFlight();
     }
 
-        @Test
-    void getAllFlightBySearch() throws Exception{
-            LocalDate testDate = LocalDate.of(2024, 9, 27);
-            Routes origin = new Routes(1L, "Spain", "Madrid");
-            Routes destination = new Routes(2L, "France", "Paris");
-            Passengers passengers = new Passengers(1L, 200, 100);
-            Flight flight = new Flight(1L, testDate, destination, origin, passengers, 1);
-            ArrayList<Flight> flightList = new ArrayList<>();
-            flightList.add(flight);
-            when(flightsService.getAllFlightBySearch(anyString(), anyString(), anyString(), anyString(), any(LocalDate.class)))
-                    .thenReturn(flightList);
-            mockMvc.perform(get("/api/flight/search")
-                            .param("originCountry", "Spain")
-                            .param("originCity", "Madrid")
-                            .param("destinationCountry", "France")
-                            .param("destinationCity", "Paris")
-                            .param("localDate", testDate.toString())
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$").isArray())
-                    .andExpect(jsonPath("$.length()").value(1));
-        }
+    @Test
+    void getAllFlightBySearch() throws Exception {
+        LocalDate testDate = LocalDate.of(2024, 9, 27);
+        Routes origin = new Routes(1L, "Spain", "Madrid");
+        Routes destination = new Routes(2L, "France", "Paris");
+        Passengers passengers = new Passengers(1L, 200, 100);
+        Flight flight = new Flight(1L, testDate.atStartOfDay(), destination, origin, passengers, 1);
+        ArrayList<Flight> flightList = new ArrayList<>();
+        flightList.add(flight);
+        when(flightsService.getAllFlightBySearch(anyString(), anyString(), anyString(), anyString(), any(LocalDate.class)))
+                .thenReturn(flightList);
+        mockMvc.perform(get("/api/flight/search")
+                        .param("originCountry", "Spain")
+                        .param("originCity", "Madrid")
+                        .param("destinationCountry", "France")
+                        .param("destinationCity", "Paris")
+                        .param("localDate", testDate.toString())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(1));
+    }
+
 
     @Test
-    void deleteFlight() throws Exception{
+    void deleteFlight() throws Exception {
         mockMvc.perform(delete("/api/flight/delete/1"))
                 .andExpect(status().isOk());
 
@@ -94,7 +99,7 @@ class FlightsControllerTest {
     @Test
     void updateFlight() throws Exception {
         Long flightId = 1L;
-        LocalDate testDate = LocalDate.of(2024, 9, 27);
+        LocalDateTime testDate = LocalDateTime.of(2024, 9, 27, 14, 30);
         Routes origin = new Routes(1L, "Spain", "Madrid");
         Routes destination = new Routes(2L, "France", "Paris");
         Passengers passengers = new Passengers(1L, 200, 100);
@@ -110,7 +115,7 @@ class FlightsControllerTest {
 
     @Test
     void createFlight() throws Exception {
-        LocalDate departureDate = LocalDate.of(2024, 9, 27);
+        LocalDateTime departureDate = LocalDateTime.of(2024, 9, 27, 14, 30);
         Routes origin = new Routes(1L, "Spain", "Madrid");
         Routes destination = new Routes(2L, "France", "Paris");
         Passengers passengers = new Passengers(1L, 200, 100);

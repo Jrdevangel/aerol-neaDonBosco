@@ -43,4 +43,8 @@ public class WalletService {
         wallet.setEuro(sum);
         return iWalletRepository.save(wallet);
     }
+
+    public void saveWallet(Wallet wallet) {
+        iWalletRepository.save(wallet);
+    }
 }

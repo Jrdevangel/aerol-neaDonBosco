@@ -5,6 +5,7 @@ package com.flightDB.DBApp.service;
 import com.flightDB.DBApp.model.Passengers;
 import com.flightDB.DBApp.repository.IPassengersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,23 +23,19 @@ public class PassengersService {
         this.passengersRepository = passengersRepository;
     }
 
-    // Create a new passenger
     public Passengers createPassenger(Passengers passenger) {
         return passengersRepository.save(passenger);
     }
 
-    // Get a passenger by ID
     public Optional<Passengers> getPassengerById(Long id) {
         return passengersRepository.findById(id);
     }
 
-    // Get all passengers
     public List<Passengers> getAllPassengers() {
         return StreamSupport.stream(passengersRepository.findAll().spliterator(), false)
                 .collect(Collectors.toList());
     }
 
-    // Update a passenger
     public Passengers updatePassenger(Long id, Passengers passenger) {
         Optional<Passengers> existingPassengerOpt = passengersRepository.findById(id);
         if (existingPassengerOpt.isPresent()) {
@@ -48,12 +45,15 @@ public class PassengersService {
             existingPassenger.setFlights(passenger.getFlights());
             return passengersRepository.save(existingPassenger);
         } else {
-            return null; // Or handle as needed
+            return null;
         }
     }
 
-    // Delete a passenger by ID
     public void deletePassenger(Long id) {
         passengersRepository.deleteById(id);
+    }
+
+    public void savePassengers(Passengers passengers) {
+        passengersRepository.save(passengers);
     }
 }

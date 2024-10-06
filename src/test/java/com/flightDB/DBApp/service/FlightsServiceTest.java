@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -69,7 +70,7 @@ class FlightsServiceTest {
         Routes destination = new Routes(2L, "France", "Paris");
         Passengers passengers = new Passengers(1L, 200, 100);
         Flight existingFlight = new Flight(1L, null, destination, origin, passengers, 1);
-        Flight newBoeing = new Flight(1L, LocalDate.now(), destination, origin, passengers, 1);
+        Flight newBoeing = new Flight(1L, LocalDateTime.now(), destination, origin, passengers, 1);
 
         when(iFlightRepository.findById(1L)).thenReturn(Optional.of(existingFlight));
         when(iFlightRepository.save(newBoeing)).thenReturn(newBoeing);
@@ -91,7 +92,7 @@ class FlightsServiceTest {
 
         List<Flight> flightList = new ArrayList<>();
         Flight rainer = new Flight(1L, null, destination, origin, passengers, 1);
-        Flight boeing = new Flight(2L, LocalDate.now(), destination, origin, passengers, 1);
+        Flight boeing = new Flight(2L, LocalDateTime.now(), destination, origin, passengers, 1);
 
         flightList.add(rainer);
         flightList.add(boeing);
@@ -112,7 +113,7 @@ class FlightsServiceTest {
 
         List<Flight> flightList = new ArrayList<>();
         Flight rainer = new Flight(1L, null, destination, origin, passengers, 1);
-        Flight boeing = new Flight(2L, LocalDate.now(), destination, origin, passengers, 1);
+        Flight boeing = new Flight(2L, LocalDateTime.now(), destination, origin, passengers, 1);
 
         flightList.add(rainer);
         flightList.add(boeing);

@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.sql.Blob;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -20,7 +21,7 @@ public class Flight {
     private Long id;
 
     @Column(nullable = false)
-    private LocalDate departureTime;
+    private LocalDateTime departureTime;
 
     @Column
     private boolean availableSeat;
@@ -45,7 +46,7 @@ public class Flight {
     @Column
     private Blob photo;
 
-    public Flight(Long id, LocalDate departureTime, Routes destination, Routes origin, Passengers passengers, double costEuro) {
+    public Flight(Long id, LocalDateTime departureTime, Routes destination, Routes origin, Passengers passengers, double costEuro) {
         this.id = id;
         this.departureTime = departureTime;
         this.destination = destination;
