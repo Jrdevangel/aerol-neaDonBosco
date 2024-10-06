@@ -7,6 +7,7 @@ import com.flightDB.DBApp.model.Passengers;
 import com.flightDB.DBApp.model.Reservation;
 import com.flightDB.DBApp.model.User;
 import com.flightDB.DBApp.repository.*;
+import com.flightDB.DBApp.repository.IReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,6 @@ import java.util.stream.StreamSupport;
 
 @Service
 public class ReservationService {
-
 
     private final IReservationRepository reservationRepository;
     private final IPassengersRepository iPassengersRepository;
