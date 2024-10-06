@@ -4,6 +4,7 @@ import com.flightDB.DBApp.model.User;
 import com.flightDB.DBApp.model.Wallet;
 import com.flightDB.DBApp.repository.IWalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,5 +35,12 @@ public class WalletService {
     }
     public Wallet getByUserId(Long userId) {
         return iWalletRepository.findByUserId(userId).orElseThrow();
+    }
+
+    public Wallet addMoney(Long userId, double money) {
+        Wallet wallet = iWalletRepository.findByUserId(userId).orElseThrow();
+        double sum = wallet.getEuro() + money;
+        wallet.setEuro(sum);
+        return iWalletRepository.save(wallet);
     }
 }

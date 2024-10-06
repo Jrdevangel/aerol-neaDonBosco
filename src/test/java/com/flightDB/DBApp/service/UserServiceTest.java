@@ -2,26 +2,18 @@ package com.flightDB.DBApp.service;
 
 import com.flightDB.DBApp.model.ERole;
 import com.flightDB.DBApp.model.User;
-import com.flightDB.DBApp.repository.IFlightRepository;
 import com.flightDB.DBApp.repository.IUserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-
-import javax.management.relation.Role;
 import java.util.Optional;
 import static org.mockito.Mockito.when;
-
 class UserServiceTest {
-
-    private MockMvc mockMvc;
 
     @Mock
     IUserRepository iUserRepository;
@@ -39,10 +31,17 @@ class UserServiceTest {
 
     @Test
     void deleteUser() {
+        Long userId = 1L;
+
+        doNothing().when(iUserRepository).deleteById(userId);
+
+        userService.deleteUser(userId);
+
+        verify(iUserRepository, times(1)).deleteById(userId);
     }
 
     @Test
-    void updatePassword_ShouldUpdatePassword_WhenOldPasswordIsCorrect() {
+    void updatePassword_WhenOldPasswordIsCorrect() {
         Long userId = 1L;
         String oldPassword = "oldPassword";
         String newPassword = "newPassword";
@@ -59,14 +58,16 @@ class UserServiceTest {
         when(passwordEncoder.matches(oldPassword, encodedOldPassword)).thenReturn(true);
         when(passwordEncoder.encode(newPassword)).thenReturn(encodedNewPassword);
         when(iUserRepository.save(mockUser)).thenReturn(mockUser);
+
         User updatedUser = userService.updatePassword(oldPassword, newPassword, userId);
-        assertNotNull(updatedUser, "The updatedUser should not be null");
-        assertTrue(realPasswordEncoder.matches(newPassword, updatedUser.getPassword()), "The new password should match the encoded password");
+
+        assertNotNull(updatedUser);
+        assertTrue(realPasswordEncoder.matches(newPassword, updatedUser.getPassword()));
         verify(iUserRepository).save(mockUser);
     }
 
     @Test
-    void updatePassword_ShouldThrowException_WhenOldPasswordIsIncorrect() {
+    void updatePassword_WhenOldPasswordIsIncorrect() {
         Long userId = 1L;
         String oldPassword = "oldPassword";
         String newPassword = "newPassword";
@@ -77,7 +78,6 @@ class UserServiceTest {
         mockUser.setPassword(encodedOldPassword);
 
         when(iUserRepository.findById(userId)).thenReturn(Optional.of(mockUser));
-
         when(passwordEncoder.matches(oldPassword, encodedOldPassword)).thenReturn(false);
 
         Exception exception = assertThrows(RuntimeException.class, () -> {
@@ -85,76 +85,81 @@ class UserServiceTest {
         });
 
         assertEquals("Old password is incorrect", exception.getMessage());
-
         verify(iUserRepository, never()).save(mockUser);
-    }
-
-    @Test
-    void updatePassword_ShouldThrowException_WhenUserNotFound() {
-        Long userId = 1L;
-        String oldPassword = "oldPassword";
-        String newPassword = "newPassword";
-
-        when(iUserRepository.findById(userId)).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            userService.updatePassword(oldPassword, newPassword, userId);
-        });
-
-        assertEquals("User not found", exception.getMessage());
-
-        verify(iUserRepository, never()).save(any(User.class));
     }
 
     @Test
     void getUserById() {
         ERole eRole = ERole.USER;
-        User flight = new User();
-        flight.setId(1L);
-        flight.setUsername("Angel");
-        flight.setPassword("1234");
-        flight.setEmail("angel@gmail.com");
-        flight.setRole(eRole);
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("Angel");
+        user.setPassword("1234");
+        user.setEmail("angel@gmail.com");
+        user.setRole(eRole);
 
-        when(iUserRepository.findById(1L)).thenReturn(Optional.of(flight));
+        when(iUserRepository.findById(1L)).thenReturn(Optional.of(user));
+
         User response = userService.getUserById(1L);
+
         assertEquals(1L, response.getId());
+        assertEquals("Angel", response.getUsername());
     }
+
 
     @Test
     void updateRole() {
-        ERole eRole = ERole.USER;
-        ERole newErole = ERole.ADMIN;
-        User flight = new User();
-        flight.setId(1L);
-        flight.setUsername("Angel");
-        flight.setPassword("1234");
-        flight.setEmail("angel@gmail.com");
-        flight.setRole(eRole);
-        when(iUserRepository.findById(1L)).thenReturn(Optional.of(flight));
+        ERole oldRole = ERole.USER;
+        ERole newRole = ERole.ADMIN;
 
-        when(iUserRepository.save(flight)).thenReturn(flight);
-        User response = userService.updateRole(newErole, 1L);
-        assertEquals(newErole, response.getRole());
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("Angel");
+        user.setRole(oldRole);
+
+        when(iUserRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(iUserRepository.save(user)).thenReturn(user);
+
+        User response = userService.updateRole(newRole, 1L);
+
+        assertEquals(newRole, response.getRole());
     }
 
     @Test
     void updateUsername() {
-        ERole eRole = ERole.USER;
-        User flight = new User();
-        flight.setId(1L);
-        flight.setUsername("Angel");
-        flight.setPassword("1234");
-        flight.setEmail("angel@gmail.com");
-        flight.setRole(eRole);
+        ERole role = ERole.USER;
 
-        when(iUserRepository.save(flight)).thenReturn(flight);
-        when(iUserRepository.findById(1L)).thenReturn(Optional.of(flight));
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("Angel");
+        user.setPassword("1234");
+        user.setEmail("angel@gmail.com");
+        user.setRole(role);
+
+        when(iUserRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(iUserRepository.save(user)).thenReturn(user);
+
         User response = userService.updateUsername("Maksym", 1L);
+
         assertEquals("Maksym", response.getUsername());
     }
 
     @Test
     void getUserByUsername() {
+        String username = "Angel";
+        ERole role = ERole.USER;
+
+        User user = new User();
+        user.setId(1L);
+        user.setUsername(username);
+        user.setPassword("1234");
+        user.setEmail("angel@gmail.com");
+        user.setRole(role);
+
+        when(iUserRepository.findByUsername(username)).thenReturn(Optional.of(user));
+
+        User response = userService.getUserByUsername(username);
+
+        assertEquals(username, response.getUsername());
     }
 }

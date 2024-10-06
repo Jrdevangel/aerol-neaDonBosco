@@ -24,4 +24,9 @@ public class WalletController {
     public Wallet getByUserId(@PathVariable Long userId) {
         return walletService.getByUserId(userId);
     }
+
+    @PutMapping(path = "/user/addMoney/{userId}")
+    public Wallet addMoney(@PathVariable Long userId,@RequestParam double money) {
+        return walletService.addMoney(userId, money);
+    }
 }
