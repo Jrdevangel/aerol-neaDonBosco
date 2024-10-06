@@ -52,12 +52,12 @@ public class ReservationController {
 
 
     @PutMapping(path = "/update/reservation/{id}")
-    public ResponseEntity<Reservation> updateReservation(@PathVariable Long id, @RequestBody Reservation reservation){
-        Reservation updated = reservationService.updateReservation(id, reservation);
-        if (updated != null) {
-            return ResponseEntity.ok(updated);
-        } else {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> buyReservation(@RequestBody Reservation reservation) {
+        try {
+            Reservation savedReservation = reservationService.buyReservation(reservation);
+            return new ResponseEntity<>(savedReservation, HttpStatus.OK);
+        } catch (IllegalArgumentException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
