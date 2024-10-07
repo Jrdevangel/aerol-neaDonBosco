@@ -33,17 +33,22 @@ public class ReservationService {
     }
 
     public Reservation buyReservation(Reservation reservation) {
-        User user = userService.getUserById(reservation.getUser().getId());
         Flight flight = flightsService.getFlightById(reservation.getFlight().getId());
-        Passengers passengers = flight.getPassengers();
+        if(flight.getDepartureTime().isAfter(LocalDateTime.now())) {
+            User user = userService.getUserById(reservation.getUser().getId());
 
-        validateSeatAvailability(reservation, passengers);
-        double totalCost = calculateTotalCost(flight, reservation);
-        validateUserBalance(user, totalCost);
+            Passengers passengers = flight.getPassengers();
 
-        updateUserWallet(user, totalCost);
-        updateFlightAndPassengers(flight, passengers, reservation);
-        return finalizeReservation(reservation, user, flight);
+            validateSeatAvailability(reservation, passengers);
+            double totalCost = calculateTotalCost(flight, reservation);
+            validateUserBalance(user, totalCost);
+
+            updateUserWallet(user, totalCost);
+            updateFlightAndPassengers(flight, passengers, reservation);
+            return finalizeReservation(reservation, user, flight);
+        } else {
+            throw new IllegalArgumentException("The time of flight has ended.");
+        }
     }
 
     private void validateSeatAvailability(Reservation reservation, Passengers passengers) {
@@ -88,12 +93,15 @@ public class ReservationService {
     public String returnReservation(Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+        if(reservation.getFlight().getDepartureTime().isAfter(LocalDateTime.now())) {
+            double userSumMoney = calculateRefundAmount(reservation);
+            updateFlightAndUserWallet(reservation, userSumMoney);
 
-        double userSumMoney = calculateRefundAmount(reservation);
-        updateFlightAndUserWallet(reservation, userSumMoney);
-
-        reservationRepository.deleteById(reservationId);
-        return "Has been returned " + userSumMoney + " euro.";
+            reservationRepository.deleteById(reservationId);
+            return "Has been returned " + userSumMoney + " euro.";
+        } else {
+            return "You can't return because the time has ended";
+        }
     }
 
     private double calculateRefundAmount(Reservation reservation) {

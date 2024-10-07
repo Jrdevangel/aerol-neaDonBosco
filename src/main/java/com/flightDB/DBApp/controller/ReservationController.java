@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -24,14 +26,20 @@ public class ReservationController {
 
 
     @PostMapping(path = "/new/reservation")
-    public ResponseEntity<Reservation> createReservation(@RequestBody Reservation reservation) {
+    public ResponseEntity<?> createReservation(@RequestBody Reservation reservation) {
         try {
             Reservation created = reservationService.buyReservation(reservation);
             return ResponseEntity.ok(created);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Bad Request");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Internal Server Error");
+            errorResponse.put("message", "An unexpected error occurred while processing your request");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
@@ -52,9 +60,9 @@ public class ReservationController {
 
 
     @PutMapping(path = "/update/reservation/{id}")
-    public ResponseEntity<?> buyReservation(@RequestBody Reservation reservation) {
+    public ResponseEntity<?> updateReservation(@PathVariable Long id,@RequestBody Reservation reservation) {
         try {
-            Reservation savedReservation = reservationService.buyReservation(reservation);
+            Reservation savedReservation = reservationService.updateReservation(id ,reservation);
             return new ResponseEntity<>(savedReservation, HttpStatus.OK);
         } catch (IllegalArgumentException ex) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);

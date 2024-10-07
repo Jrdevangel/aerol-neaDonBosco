@@ -69,23 +69,6 @@ class WalletServiceTest {
         verify(iWalletRepository, times(1)).save(any(Wallet.class));
     }
 
-    @Test
-    void addEuro_ShouldReturnUpdatedWallet() {
-        Wallet wallet = new Wallet();
-        wallet.setId(1L);
-        wallet.setEuro(100.0);
-
-        when(iWalletRepository.findById(1L)).thenReturn(Optional.of(wallet));
-        when(iWalletRepository.save(any(Wallet.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        Wallet result = walletService.addEuro(1L, 50.0);
-
-        assertNotNull(result);
-        assertEquals(1L, result.getId());
-        assertEquals(150.0, result.getEuro());
-        verify(iWalletRepository, times(1)).findById(1L);
-        verify(iWalletRepository, times(1)).save(any(Wallet.class));
-    }
 
     @Test
     void getByUserId_ShouldReturnWallet() {

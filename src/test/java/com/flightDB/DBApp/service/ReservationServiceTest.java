@@ -61,6 +61,7 @@ class ReservationServiceTest {
         passengers.setCapacity(10);
         passengers.setReservedSeats(0);
         flight.setPassengers(passengers);
+        flight.setDepartureTime(LocalDateTime.MAX);
 
         Reservation reservation = new Reservation();
         reservation.setUser(user);
@@ -84,6 +85,45 @@ class ReservationServiceTest {
     }
 
     @Test
+    void buyReservation_error_the_time_has_ended() {
+        User user = new User();
+        user.setId(1L);
+        Wallet wallet = new Wallet();
+        wallet.setEuro(100.0);
+        user.setWallet(wallet);
+
+        Flight flight = new Flight();
+        flight.setId(1L);
+        flight.setCostEuro(20.0);
+        Passengers passengers = new Passengers();
+        passengers.setCapacity(10);
+        passengers.setReservedSeats(0);
+        flight.setPassengers(passengers);
+        flight.setDepartureTime(LocalDateTime.MIN);
+
+        Reservation reservation = new Reservation();
+        reservation.setUser(user);
+        reservation.setFlight(flight);
+        reservation.setReservedSeats(2);
+
+        when(userService.getUserById(1L)).thenReturn(user);
+        when(flightsService.getFlightById(1L)).thenReturn(flight);
+
+        doNothing().when(walletService).saveWallet(any(Wallet.class));
+        doNothing().when(passengersService).savePassengers(any(Passengers.class));
+        doNothing().when(flightsService).saveFlight(any(Flight.class));
+        when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
+
+        IllegalArgumentException thrown = assertThrows(
+                IllegalArgumentException.class,
+                () -> reservationService.buyReservation(reservation),
+                "Expected buyReservation() to throw, but it didn't"
+        );
+
+        assertEquals("The time of flight has ended.", thrown.getMessage());
+    }
+
+    @Test
     void returnReservation_success() {
         User user = new User();
         user.setWallet(new Wallet());
@@ -95,6 +135,7 @@ class ReservationServiceTest {
         passengers.setReservedSeats(2);
         passengers.setCapacity(10);
         flight.setPassengers(passengers);
+        flight.setDepartureTime(LocalDateTime.MAX);
 
         Reservation reservation = new Reservation();
         reservation.setUser(user);
@@ -110,6 +151,35 @@ class ReservationServiceTest {
 
         assertEquals("Has been returned 90.0 euro.", result);
         assertEquals(90.0, user.getWallet().getEuro());
+    }
+
+    @Test
+    void returnReservation_error_the_time_has_ended() {
+        User user = new User();
+        user.setWallet(new Wallet());
+        user.getWallet().setEuro(50.0);
+
+        Flight flight = new Flight();
+        flight.setCostEuro(20.0);
+        Passengers passengers = new Passengers();
+        passengers.setReservedSeats(2);
+        passengers.setCapacity(10);
+        flight.setPassengers(passengers);
+        flight.setDepartureTime(LocalDateTime.MIN);
+
+        Reservation reservation = new Reservation();
+        reservation.setUser(user);
+        reservation.setFlight(flight);
+        reservation.setReservedSeats(2);
+
+        when(reservationRepository.findById(anyLong())).thenReturn(Optional.of(reservation));
+        doNothing().when(walletService).saveWallet(any(Wallet.class));
+        doNothing().when(passengersService).savePassengers(any(Passengers.class));
+        doNothing().when(flightsService).saveFlight(any(Flight.class));
+
+        String result = reservationService.returnReservation(1L);
+
+        assertEquals("You can't return because the time has ended", result);
     }
 
     @Test

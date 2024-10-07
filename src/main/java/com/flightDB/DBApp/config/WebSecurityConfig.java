@@ -39,6 +39,11 @@ public class WebSecurityConfig {
                                 "/api/wallet/create/{id}",
                                 "/api/user/updateUsername/{id}",
                                 "/api/user/updatePassword/{id}",
+                                "/api/wallet/user/addMoney/{userId}",
+                                "api/v1/routes",
+                                "/api/v1/passengers",
+                                "/api/flight/create",
+                                "/api/v1/routes/new/routes",
                                 "/api/test/all"
                         ).permitAll()
                         .requestMatchers(
