@@ -3,6 +3,8 @@ package com.flightDB.DBApp.controller;
 import com.flightDB.DBApp.model.Flight;
 import com.flightDB.DBApp.service.FlightsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -34,8 +36,9 @@ public class FlightsController {
     public Flight updateFlight(@PathVariable Long id, @RequestBody Flight newFlight) {
         return flightsService.updateFlight(id, newFlight);
     }
-    @PostMapping(path = "/create")
-    public Flight createFlight(@RequestBody Flight flight) {
-        return flightsService.createFlight(flight);
-    }
-}
+    @PostMapping("/create")
+    public ResponseEntity<Flight> createFlight(@RequestBody Flight flight) {
+        Flight createdFlight = flightsService.createFlight(flight);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdFlight);
+    }}
+

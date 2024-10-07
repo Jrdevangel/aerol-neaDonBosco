@@ -16,7 +16,6 @@ public class FlightsService {
     @Autowired
     IFlightRepository iFlightRepository;
 
-
     public List<Flight> getAllFlight() {
         return (List<Flight>) iFlightRepository.findAll();
     }
@@ -49,9 +48,10 @@ public class FlightsService {
     }
 
 
-    public Flight createFlight (Flight flight) {
+    public Flight createFlight(Flight flight) {
         return iFlightRepository.save(flight);
     }
+
 
     public void saveFlight(Flight flight) {
         iFlightRepository.save(flight);

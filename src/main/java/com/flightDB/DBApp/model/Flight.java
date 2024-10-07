@@ -6,16 +6,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Blob;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-
+import java.util.ArrayList;
+import java.util.List;
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 public class Flight {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -37,14 +35,14 @@ public class Flight {
     private Routes origin;
 
     @ManyToOne(optional = true)
-    @JoinColumn(name = "passengers_ID", nullable = true)
+    @JoinColumn(name = "passengers_ID", nullable = false)
     private Passengers passengers;
 
     @Column(nullable = false)
     private double costEuro;
 
-    @Column
-    private Blob photo;
+    @OneToMany(mappedBy = "flight", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FlightImage> images = new ArrayList<>(); // Initialize to an empty list
 
     public Flight(Long id, LocalDateTime departureTime, Routes destination, Routes origin, Passengers passengers, double costEuro) {
         this.id = id;
@@ -53,5 +51,6 @@ public class Flight {
         this.origin = origin;
         this.passengers = passengers;
         this.costEuro = costEuro;
+        this.images = new ArrayList<>(); // Ensure images is initialized
     }
 }
