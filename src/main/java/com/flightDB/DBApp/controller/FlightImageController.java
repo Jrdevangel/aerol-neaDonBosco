@@ -22,36 +22,30 @@ public class FlightImageController {
     @Autowired
     private FlightsService flightService;
 
-    // Отримання зображень за ID рейсу
     @GetMapping("/flight/{flightId}")
     public List<FlightImage> getImagesByFlightId(@PathVariable Long flightId) {
         return flightImageService.getImagesByFlightId(flightId);
     }
 
-    // Завантаження зображення для рейсу
     @PostMapping("/create/{flightId}")
     public ResponseEntity<?> uploadFlightImage(
             @PathVariable Long flightId,
             @RequestParam("file") MultipartFile file) {
         try {
-            // Перевірка наявності файлу
             if (file.isEmpty()) {
                 return ResponseEntity.badRequest().body("File cannot be empty.");
             }
 
-            // Отримання рейсу за ID
             Flight flight = flightService.getFlightById(flightId);
             if (flight == null) {
                 return ResponseEntity.badRequest().body("Flight not found.");
             }
 
-            // Збереження файлу
             byte[] imageBytes = file.getBytes();
             FlightImage flightImage = new FlightImage();
-            flightImage.setImageData(imageBytes); // Зберігаємо зображення як байти
+            flightImage.setImageData(imageBytes);
             flightImage.setFlight(flight);
 
-            // Збереження зображення
             flightImageService.saveFlightImage(flightImage);
 
             return ResponseEntity.ok("Image uploaded successfully.");
@@ -60,9 +54,13 @@ public class FlightImageController {
         }
     }
 
-    // Видалення зображення за ID
     @DeleteMapping("/delete/{id}")
     public void deleteFlightImage(@PathVariable Long id) {
         flightImageService.deleteFlightImage(id);
+    }
+    @PutMapping(path = "/update/{id}")
+    public FlightImage updateImage(@PathVariable Long id, @RequestBody FlightImage flightImage) {
+        flightImage.setId(id);
+        return flightImageService.saveFlightImage(flightImage);
     }
 }

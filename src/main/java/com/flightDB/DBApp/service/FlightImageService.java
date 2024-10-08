@@ -19,12 +19,10 @@ public class FlightImageService {
     @Autowired
     private IFlightRepository flightRepository;
 
-    // Отримання зображень за ID рейсу
     public List<FlightImage> getImagesByFlightId(Long flightId) {
         return flightImageRepository.findByFlightId(flightId);
     }
 
-    // Створення зображення на основі Base64
     public FlightImage createFlightImage(String imageDataBase64, Flight flight) {
         byte[] imageData;
         try {
@@ -41,7 +39,6 @@ public class FlightImageService {
         return flightImageRepository.save(flightImage);
     }
 
-    // Видалення зображення
     public void deleteFlightImage(Long id) {
         flightImageRepository.deleteById(id);
     }

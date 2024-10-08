@@ -22,6 +22,10 @@ public class FlightsController {
     public List<Flight> getAllFlights() {
         return flightsService.getAllFlight();
     }
+    @GetMapping(path = "/get/{id}")
+    public Flight getById(@PathVariable Long id) {
+        return flightsService.getFlightById(id);
+    }
     @GetMapping(path = "/search")
     public List<Flight> getAllFlightBySearch(@RequestParam String originCountry, @RequestParam String originCity, @RequestParam String destinationCountry, @RequestParam String destinationCity, @RequestParam(required = false) LocalDate localDate) {
         return flightsService.getAllFlightBySearch(originCountry, originCity, destinationCountry, destinationCity, localDate);

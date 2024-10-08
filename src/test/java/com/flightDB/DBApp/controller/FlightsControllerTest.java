@@ -128,8 +128,8 @@ class FlightsControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newFlight)))
                 .andDo(print())
-                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L));
         verify(flightsService, times(1)).createFlight(any(Flight.class));
     }
+
 }

@@ -31,27 +31,16 @@ public class WebSecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                // Шляхи доступні всім
                                 "/api/auth/**",
-                                "/api/flight/search",
-                                "/api/flight/create",
-                                "/api/image/create/**",
-                                "/api/flight/all",
-                                "/api/v1/new/reservation",
                                 "/api/wallet/user/{userId}",
-                                "/api/v1/reservation/user/{userId}",
                                 "/api/wallet/create/{id}",
-                                "/api/user/updateUsername/{id}",
-                                "/api/user/updatePassword/{id}",
-                                "/api/wallet/user/addMoney/{userId}",
-                                "/api/v1/routes",
-                                "/api/v1/passengers",
+                                "/api/flight/search",
                                 "/api/v1/routes/new/routes",
+                                "/api/flight/get/{id}",
                                 "/api/test/all"
                         ).permitAll()
 
                         .requestMatchers(
-                                // Шляхи доступні для користувачів з роллю USER
                                 "/api/user/delete",
                                 "/api/user/updateUsername",
                                 "/api/user/updatePassword",
@@ -59,13 +48,20 @@ public class WebSecurityConfig {
                         ).hasAnyAuthority("ROLE_USER")
 
                         .requestMatchers(
-                                // Шляхи доступні для користувачів з ролями USER і ADMIN
-                                "/api/user"
+                                "/api/wallet/user/addMoney/{userId}",
+                                "/api/user",
+                                "/api/user/updateUsername/{id}",
+                                "/api/user/updatePassword/{id}",
+                                "/api/v1/new/reservation"
                         ).hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
 
                         .requestMatchers(
-                                // Адміністраторські шляхи
                                 "/api/flight/**",
+                                "/api/flight/all",
+                                "/api/flight/create",
+                                "/api/flight/update/**",
+                                "/api/image/create/**",
+                                "/api/flight/delete/{id}",
                                 "/api/v1/new/routes",
                                 "/api/v1/update/routes/{id}",
                                 "/api/v1/delete/routes/{id}",
@@ -74,16 +70,19 @@ public class WebSecurityConfig {
                                 "/api/v1/new/passengers",
                                 "/api/v1/update/passengers/{id}",
                                 "/api/v1/delete/passengers/{id}",
-                                "/api/test/admin"
+                                "/api/test/admin",
+                                "/api/v1/routes",
+                                "/api/v1/passengers"
                         ).hasRole("ADMIN")
 
                         .requestMatchers(
-                                // Спільні шляхи для ADMIN та USER
                                 "/api/test/user",
+                                "/api/v1/reservation/user/**",
                                 "/api/v1/routes/**",
                                 "/api/v1/update/reservation/{id}",
                                 "/api/v1/delete/reservation/{id}",
                                 "/api/v1/reservation/**",
+                                "/api/wallet/user/addMoney/{userId}",
                                 "/api/v1/passengers/**"
                         ).hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
                         .requestMatchers("/api/v1/passengers/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
