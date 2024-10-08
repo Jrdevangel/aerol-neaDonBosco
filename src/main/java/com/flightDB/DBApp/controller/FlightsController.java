@@ -44,5 +44,6 @@ public class FlightsController {
     public ResponseEntity<Flight> createFlight(@RequestBody Flight flight) {
         Flight createdFlight = flightsService.createFlight(flight);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdFlight);
-    }}
+    }
+}
 

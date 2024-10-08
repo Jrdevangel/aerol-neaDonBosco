@@ -129,10 +129,10 @@ class UserControllerTest {
     @Test
     void getById_ShouldReturnUser() throws Exception {
         User user = new User(1L, "testUser", "password", "email@test.com", ERole.USER, new HashSet<>(), new Wallet());
+
         when(userService.getUserById(1L)).thenReturn(user);
 
-        mockMvc.perform(get("/api/user/getByID")
-                        .param("id", "1")
+        mockMvc.perform(get("/api/user/get/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
@@ -142,6 +142,7 @@ class UserControllerTest {
 
         verify(userService, times(1)).getUserById(1L);
     }
+
 
     @Test
     void updateRole_ShouldReturnUpdatedUserRole() throws Exception {
@@ -167,5 +168,16 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(userService, never()).updateRole(any(ERole.class), anyLong());
+    }
+
+    @Test
+    void deleteUser() throws Exception{
+        Long userId = 1L;
+
+        mockMvc.perform(delete("/api/user/delete/{id}", userId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(userService, times(1)).deleteUser(userId);
     }
 }

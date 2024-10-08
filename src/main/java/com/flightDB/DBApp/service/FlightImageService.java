@@ -23,6 +23,10 @@ public class FlightImageService {
         return flightImageRepository.findByFlightId(flightId);
     }
 
+    public FlightImage getById(Long id) {
+        return flightImageRepository.getReferenceById(id);
+    }
+
     public FlightImage createFlightImage(String imageDataBase64, Flight flight) {
         byte[] imageData;
         try {

@@ -51,8 +51,8 @@ public class UserController {
         return userService.updatePassword(oldPassword,password, id);
     }
 
-    @GetMapping(path = "/getByID")
-    public User getById(@RequestParam Long id) {
+    @GetMapping(path = "/get/{id}")
+    public User getById(@PathVariable Long id) {
         return userService.getUserById(id);
     }
 

@@ -58,9 +58,29 @@ public class FlightImageController {
     public void deleteFlightImage(@PathVariable Long id) {
         flightImageService.deleteFlightImage(id);
     }
-    @PutMapping(path = "/update/{id}")
-    public FlightImage updateImage(@PathVariable Long id, @RequestBody FlightImage flightImage) {
-        flightImage.setId(id);
-        return flightImageService.saveFlightImage(flightImage);
+
+    @PutMapping(path = "/update/{flightImageId}")
+    public ResponseEntity<?> updateFlightImage( @PathVariable Long flightImageId, @RequestParam("file") MultipartFile file) {
+        try {
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body("File cannot be empty.");
+            }
+
+            FlightImage flightImage = flightImageService.getById(flightImageId);
+            if (flightImage == null) {
+                return ResponseEntity.badRequest().body("FlightImage not found.");
+            }
+
+            byte[] imageBytes = file.getBytes();
+            FlightImage newFlightImage = new FlightImage();
+            newFlightImage.setImageData(imageBytes);
+            newFlightImage.setFlight(flightImage.getFlight());
+
+            flightImageService.saveFlightImage(newFlightImage);
+
+            return ResponseEntity.ok("Image updated successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error saving image: " + e.getMessage());
+        }
     }
 }

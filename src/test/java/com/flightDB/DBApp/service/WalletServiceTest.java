@@ -103,4 +103,17 @@ class WalletServiceTest {
         verify(iWalletRepository, times(1)).findByUserId(1L);
         verify(iWalletRepository, times(1)).save(any(Wallet.class));
     }
+
+    @Test
+    void saveWallet() {
+        Wallet wallet = new Wallet();
+        wallet.setId(1L);
+        wallet.setEuro(200);
+
+        when(iWalletRepository.save(wallet)).thenReturn(wallet);
+
+        walletService.saveWallet(wallet);
+
+        verify(iWalletRepository, times(1)).save(wallet);
+    }
 }

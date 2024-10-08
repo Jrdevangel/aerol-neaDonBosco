@@ -132,4 +132,29 @@ class FlightsControllerTest {
         verify(flightsService, times(1)).createFlight(any(Flight.class));
     }
 
+    @Test
+    void getById() throws Exception{
+        Long flightId = 1L;
+        LocalDateTime departureDate = LocalDateTime.of(2024, 9, 27, 14, 30);
+        Routes origin = new Routes(1L, "Spain", "Madrid");
+        Routes destination = new Routes(2L, "France", "Paris");
+        Passengers passengers = new Passengers(1L, 200, 100);
+        Flight mockFlight = new Flight(flightId, departureDate, destination, origin, passengers, 1);
+
+        when(flightsService.getFlightById(flightId)).thenReturn(mockFlight);
+
+        mockMvc.perform(get("/api/flight/get/{id}", flightId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(flightId))
+                .andExpect(jsonPath("$.departureDate").value(departureDate.toString()))
+                .andExpect(jsonPath("$.destination.country").value("France"))
+                .andExpect(jsonPath("$.destination.city").value("Paris"))
+                .andExpect(jsonPath("$.origin.country").value("Spain"))
+                .andExpect(jsonPath("$.origin.city").value("Madrid"))
+                .andExpect(jsonPath("$.passengers.totalSeats").value(200))
+                .andExpect(jsonPath("$.passengers.reservedSeats").value(100));
+
+        verify(flightsService, times(1)).getFlightById(flightId);
+    }
 }

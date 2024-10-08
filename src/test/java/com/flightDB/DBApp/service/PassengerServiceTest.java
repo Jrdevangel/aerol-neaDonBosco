@@ -98,4 +98,15 @@ class PassengerServiceTest {
 
         verify(passengersRepository, times(1)).deleteById(1L);
     }
+    @Test
+    void savePassengers() {
+        Passengers passengers = new Passengers();
+        passengers.setId(1L);
+
+        when(passengersRepository.save(passengers)).thenReturn(passengers);
+
+        passengersService.savePassengers(passengers);
+
+        verify(passengersRepository, times(1)).save(passengers);
+    }
 }

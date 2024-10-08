@@ -33,10 +33,10 @@ public class WebSecurityConfig {
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/wallet/user/{userId}",
+                                "/api/image/flight/{flightId}",
                                 "/api/wallet/create/{id}",
                                 "/api/flight/search",
                                 "/api/v1/routes/new/routes",
-                                "/api/flight/get/{id}",
                                 "/api/test/all"
                         ).permitAll()
 
@@ -49,6 +49,7 @@ public class WebSecurityConfig {
 
                         .requestMatchers(
                                 "/api/wallet/user/addMoney/{userId}",
+                                "/api/user/updateRole/{id}",
                                 "/api/user",
                                 "/api/user/updateUsername/{id}",
                                 "/api/user/updatePassword/{id}",
@@ -58,13 +59,19 @@ public class WebSecurityConfig {
                         .requestMatchers(
                                 "/api/flight/**",
                                 "/api/flight/all",
+                                "/api/user/get/{id}",
                                 "/api/flight/create",
+                                "/api/v1/update/passengers/**",
                                 "/api/flight/update/**",
                                 "/api/image/create/**",
                                 "/api/flight/delete/{id}",
                                 "/api/v1/new/routes",
                                 "/api/v1/update/routes/{id}",
+                                "/api/image/flight/delete/{id}",
+                                "/api/image/flight/update/{flightImageId}",
+                                "/api/v1/update/routes/{id}",
                                 "/api/v1/delete/routes/{id}",
+                                "/api/flight/get/{id}",
                                 "/api/v1/update/flight/{id}",
                                 "/api/v1/delete/flight/{id}",
                                 "/api/v1/new/passengers",

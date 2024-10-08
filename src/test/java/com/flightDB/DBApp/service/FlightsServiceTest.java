@@ -140,4 +140,30 @@ class FlightsServiceTest {
         assertEquals(flight, result);
         verify(iFlightRepository).save(flight);
     }
+
+    @Test
+    void getFlightById_ShouldReturnFlight() {
+        Flight flight = new Flight();
+        flight.setId(1L);
+
+        when(iFlightRepository.findById(1L)).thenReturn(Optional.of(flight));
+
+        Flight response = flightsService.getFlightById(1L);
+
+        assertEquals(flight, response);
+        verify(iFlightRepository, times(1)).findById(1L);
+    }
+
+
+    @Test
+    void saveFlight() {
+        Flight flight = new Flight();
+        flight.setId(1L);
+
+        when(iFlightRepository.save(flight)).thenReturn(flight);
+
+        flightsService.saveFlight(flight);
+
+        verify(iFlightRepository, times(1)).save(flight);
+    }
 }
