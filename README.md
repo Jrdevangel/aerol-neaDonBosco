@@ -4,7 +4,7 @@ This is the backend application for a flight booking system. It provides RESTful
 
 ## Backend Repository
 
-https://github.com/maksym7576/aerolineaDonBosco-front-.git
+https://github.com/maksym7576/aerolineaDonBosco-front-
 
 ## Technologies Used
 
