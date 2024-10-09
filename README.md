@@ -98,28 +98,12 @@ This is the backend application for a flight booking system. It provides RESTful
    cd flight-booking-backend
    ```
 
-3. Install dependencies (if using Maven):
-   ```
-   mvn install
-   ```
-
-4. Configure your database connection in `application.properties` or `application.yml`
-
-5. Run the application:
-   ```
-   mvn spring-boot:run
-   ```
-
-The application will be available at `http://localhost:8080`.
-
 ## Security
 
 This application uses Spring Security for authentication and authorization. Make sure to include the JWT token in the Authorization header for protected endpoints.
 
 ## Contributing
 
-[Add contribution guidelines here]
-
-## License
-
-[Add license information here]
+[https://github.com/Jrdevangel.git]
+[https://github.com/abelloch.git]
+[https://github.com/maksym7576.git]
