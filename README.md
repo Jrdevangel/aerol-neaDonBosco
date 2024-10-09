@@ -104,6 +104,6 @@ This application uses Spring Security for authentication and authorization. Make
 
 ## Contributing
 
-[https://github.com/Jrdevangel.git]
-[https://github.com/abelloch.git]
-[https://github.com/maksym7576.git]
+[https://github.com/Jrdevangel]
+[https://github.com/abelloch]
+[https://github.com/maksym7576]
