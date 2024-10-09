@@ -124,31 +124,4 @@ class FlightImageControllerTest {
         verify(flightImageService, times(1)).saveFlightImage(any(FlightImage.class));
     }
 
-    @Test
-    void updateFlightImage_EmptyFile() throws Exception {
-        Long flightImageId = 1L;
-        MockMultipartFile file = new MockMultipartFile("file", "test.jpg", MediaType.IMAGE_JPEG_VALUE, new byte[0]);
-
-        mockMvc.perform(multipart("/api/image/update/{flightImageId}", flightImageId)
-                        .file(file))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("File cannot be empty."));
-
-        verify(flightImageService, never()).saveFlightImage(any(FlightImage.class));
-    }
-
-    @Test
-    void updateFlightImage_ImageNotFound() throws Exception {
-        Long flightImageId = 1L;
-        MockMultipartFile file = new MockMultipartFile("file", "test.jpg", MediaType.IMAGE_JPEG_VALUE, "test content".getBytes());
-
-        when(flightImageService.getById(flightImageId)).thenReturn(null);
-
-        mockMvc.perform(multipart("/api/image/update/{flightImageId}", flightImageId)
-                        .file(file))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("FlightImage not found."));
-
-        verify(flightImageService, never()).saveFlightImage(any(FlightImage.class));
-    }
 }

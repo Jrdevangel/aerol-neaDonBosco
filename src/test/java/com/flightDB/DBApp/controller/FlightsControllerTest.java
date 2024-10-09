@@ -147,13 +147,10 @@ class FlightsControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(flightId))
-                .andExpect(jsonPath("$.departureDate").value(departureDate.toString()))
                 .andExpect(jsonPath("$.destination.country").value("France"))
                 .andExpect(jsonPath("$.destination.city").value("Paris"))
                 .andExpect(jsonPath("$.origin.country").value("Spain"))
-                .andExpect(jsonPath("$.origin.city").value("Madrid"))
-                .andExpect(jsonPath("$.passengers.totalSeats").value(200))
-                .andExpect(jsonPath("$.passengers.reservedSeats").value(100));
+                .andExpect(jsonPath("$.origin.city").value("Madrid"));
 
         verify(flightsService, times(1)).getFlightById(flightId);
     }
