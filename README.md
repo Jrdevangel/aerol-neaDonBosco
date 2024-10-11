@@ -2,7 +2,7 @@
 
 This is the backend application for a flight booking system. It provides RESTful API endpoints for managing flights, reservations, users, and other related functionalities.
 
-## Backend Repository
+## Frontend Repository
 
 https://github.com/maksym7576/aerolineaDonBosco-front-
 
