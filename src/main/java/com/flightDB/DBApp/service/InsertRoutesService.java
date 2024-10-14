@@ -17,9 +17,9 @@ public class InsertRoutesService {
 
         // Datos a insertar
         Object[][] routesData = {
-                {"Xerez", "Spain"},
-                {"Madrid", "Spain"},
-                {"Paris", "France"}
+                {"Seville", "Portugal"},
+                {"Berlin", "Germany"},
+                {"Florence", "Italy"}
         };
 
         // Insertar cada fila de datos
