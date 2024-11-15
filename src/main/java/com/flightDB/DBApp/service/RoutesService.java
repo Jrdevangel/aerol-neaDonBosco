@@ -1,5 +1,3 @@
-// src/main/java/com/flightDB/DBApp/service/RoutesService.java
-
 package com.flightDB.DBApp.service;
 
 import com.flightDB.DBApp.model.Routes;
@@ -22,7 +20,14 @@ public class RoutesService {
         this.routesRepository = routesRepository;
     }
 
+    private Routes getRouteByCountryAndCity(String country, String city) {
+        return routesRepository.findByCountryAndCity(country, city);
+    }
     public Routes createRoute(Routes route) {
+        Routes routes = getRouteByCountryAndCity(route.getCountry(), route.getCity());
+        if(routes != null) {
+            new IllegalArgumentException("This route is already exists");
+        }
         return routesRepository.save(route);
     }
 

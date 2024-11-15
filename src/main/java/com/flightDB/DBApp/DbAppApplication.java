@@ -12,8 +12,6 @@ public class DbAppApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(DbAppApplication.class, args);
 	}
-
-	// Ejecutar el servicio de inserción de datos al iniciar la aplicación
 	@Bean
 	CommandLineRunner run(InsertRoutesService insertRoutesService) {
 		return args -> {
