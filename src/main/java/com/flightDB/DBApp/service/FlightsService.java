@@ -1,11 +1,14 @@
 package com.flightDB.DBApp.service;
 
+import com.flightDB.DBApp.dtos.request.FlightSearchDataDTO;
 import com.flightDB.DBApp.model.Flight;
+import com.flightDB.DBApp.model.Routes;
 import com.flightDB.DBApp.repository.IFlightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,8 +16,9 @@ import java.util.stream.Collectors;
 @Service
 public class FlightsService {
 
-    @Autowired
-    IFlightRepository iFlightRepository;
+    @Autowired private IFlightRepository iFlightRepository;
+
+    @Autowired private RoutesService routesService;
 
     public List<Flight> getAllFlight() {
         return (List<Flight>) iFlightRepository.findAll();
@@ -29,18 +33,26 @@ public class FlightsService {
         return iFlightRepository.save(newFlight);
     }
 
-    public List<Flight> getAllFlightBySearch(String originCountry, String originCity, String destinationCountry, String destinationCity, LocalDate localDate) {
-        List<Flight> flightList = (List<Flight>) iFlightRepository.findAll();
 
-        return flightList.stream()
-                .filter(flight -> flight.getOrigin().getCountry().equals(originCountry))
-                .filter(flight -> flight.getDestination().getCountry().equals(destinationCountry))
-                .filter(flight -> flight.getOrigin().getCity().equals(originCity))
-                .filter(flight -> flight.getDestination().getCity().equals(destinationCity))
-                .filter(flight -> localDate == null || (flight.getDepartureTime() != null
-                        && flight.getDepartureTime().toLocalDate().equals(localDate)))
-                .collect(Collectors.toList());
+
+    public List<Flight> getAllFlightBySearch(FlightSearchDataDTO flightSearchDataDTO) {
+        Routes originRoute = routesService.getRouteByCountryAndCity(flightSearchDataDTO.getOriginCountry(), flightSearchDataDTO.getOriginCity());
+        Routes destinationRoute = routesService.getRouteByCountryAndCity(flightSearchDataDTO.getDestinationCountry(), flightSearchDataDTO.getDestinationCity());
+        List<Flight> flightList = iFlightRepository.findByOriginIdAndDestinationId(originRoute.getId(), destinationRoute.getId());
+        List<Flight> filteredFlights = new ArrayList<>();
+        LocalDate startDate = flightSearchDataDTO.getStartLocalDate();
+        LocalDate finishDate = flightSearchDataDTO.getFinishLocalDate();
+        for (Flight flight : flightList) {
+            LocalDateTime departureTime = flight.getDepartureTime();
+            boolean matchesStartDate = (startDate == null || !departureTime.isBefore(startDate.atStartOfDay()));
+            boolean matchesFinishDate = (finishDate == null || !departureTime.isAfter(finishDate.atStartOfDay()));
+            if (matchesStartDate && matchesFinishDate) {
+                filteredFlights.add(flight);
+            }
+        }
+        return filteredFlights;
     }
+
 
 
     public Flight getFlightById(Long id) {

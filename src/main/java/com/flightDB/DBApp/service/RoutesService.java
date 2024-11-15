@@ -20,7 +20,7 @@ public class RoutesService {
         this.routesRepository = routesRepository;
     }
 
-    private Routes getRouteByCountryAndCity(String country, String city) {
+    public Routes getRouteByCountryAndCity(String country, String city) {
         return routesRepository.findByCountryAndCity(country, city);
     }
     public Routes createRoute(Routes route) {
