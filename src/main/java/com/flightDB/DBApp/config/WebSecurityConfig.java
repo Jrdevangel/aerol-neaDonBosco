@@ -36,6 +36,7 @@ public class WebSecurityConfig {
                                 "/api/image/flight/{flightId}",
                                 "/api/wallet/create/{id}",
                                 "/api/flight/search",
+                                "/api/flight/sales",
                                 "/api/v1/routes/new/routes",
                                 "/api/test/all"
                         ).permitAll()

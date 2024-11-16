@@ -1,6 +1,6 @@
 # Flight Booking Backend
 
-This is the backend application for a flight booking system. It provides RESTful API endpoints for managing flights, reservations, users, and other related functionalities.
+This is the backend application for a flight booking system. It provides RESTful API endpoints for managing flights, seats, users, and other related functionalities.
 
 ## Frontend Repository
 
@@ -53,13 +53,13 @@ https://github.com/maksym7576/aerolineaDonBosco-front-
 
 ### ReservationController
 
-- `POST /api/v1/new/reservation`: Create a new reservation
-- `GET /api/v1/reservation/{id}`: Get a specific reservation
-- `GET /api/v1/reservation`: Get all reservations
-- `PUT /api/v1/update/reservation/{id}`: Update a reservation
-- `DELETE /api/v1/delete/reservation/{id}`: Delete a reservation
-- `PUT /api/v1/return/{reservationId}`: Return a reservation
-- `GET /api/v1/reservation/user/{userId}`: Get all reservations for a user
+- `POST /api/v1/new/seats`: Create a new seats
+- `GET /api/v1/seats/{id}`: Get a specific seats
+- `GET /api/v1/seats`: Get all seats
+- `PUT /api/v1/update/seats/{id}`: Update a seats
+- `DELETE /api/v1/delete/seats/{id}`: Delete a seats
+- `PUT /api/v1/return/{reservationId}`: Return a seats
+- `GET /api/v1/seats/user/{userId}`: Get all seats for a user
 
 ### RoutesController
 

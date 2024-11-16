@@ -1,6 +1,5 @@
 package com.flightDB.DBApp.controller;
 
-import com.flightDB.DBApp.model.Passengers;
 import com.flightDB.DBApp.service.PassengersService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

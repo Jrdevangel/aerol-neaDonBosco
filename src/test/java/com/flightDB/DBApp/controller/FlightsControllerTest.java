@@ -2,7 +2,7 @@ package com.flightDB.DBApp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flightDB.DBApp.model.Flight;
-import com.flightDB.DBApp.model.Passengers;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import com.flightDB.DBApp.model.Routes;

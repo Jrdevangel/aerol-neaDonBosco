@@ -1,7 +1,9 @@
 package com.flightDB.DBApp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,16 +15,15 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Flight {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
     private LocalDateTime departureTime;
-
-    @Column
-    private boolean availableSeat;
 
     @ManyToOne(optional = true)
     @JoinColumn(name = "destination_ID", nullable = true)
@@ -34,23 +35,13 @@ public class Flight {
     @JsonIgnoreProperties({"originFlights", "destinationFlights"})
     private Routes origin;
 
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "passengers_ID", nullable = false)
-    private Passengers passengers;
+    @Column
+    private int capacity;
 
-    @Column(nullable = false)
-    private double costEuro;
+    @Column
+    private int reservedSeats;
 
     @OneToMany(mappedBy = "flight", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FlightImage> images = new ArrayList<>();
 
-    public Flight(Long id, LocalDateTime departureTime, Routes destination, Routes origin, Passengers passengers, double costEuro) {
-        this.id = id;
-        this.departureTime = departureTime;
-        this.destination = destination;
-        this.origin = origin;
-        this.passengers = passengers;
-        this.costEuro = costEuro;
-        this.images = new ArrayList<>();
-    }
 }

@@ -1,7 +1,5 @@
 package com.flightDB.DBApp.service;
 
-import com.flightDB.DBApp.model.Passengers;
-import com.flightDB.DBApp.repository.IPassengersRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

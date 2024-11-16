@@ -18,7 +18,7 @@ public class FlightImage {
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(nullable = false, length = 16 * 1024 * 1024) // Максимум 16 MB
+    @Column(nullable = false, length = 16 * 1024 * 1024)
     private byte[] imageData;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -31,6 +31,7 @@ public class FlightImage {
         this.flight = flight;
     }
 
+    @JsonIgnore
     public boolean isImageEmpty() {
         return this.imageData == null || this.imageData.length == 0;
     }

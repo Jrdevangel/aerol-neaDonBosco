@@ -1,7 +1,6 @@
 package com.flightDB.DBApp.service;
 
 import com.flightDB.DBApp.model.Flight;
-import com.flightDB.DBApp.model.Passengers;
 import com.flightDB.DBApp.model.Routes;
 import com.flightDB.DBApp.repository.IFlightRepository;
 import static org.mockito.Mockito.verify;

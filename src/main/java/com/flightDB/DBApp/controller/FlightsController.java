@@ -1,6 +1,7 @@
 package com.flightDB.DBApp.controller;
 
 import com.flightDB.DBApp.dtos.request.FlightSearchDataDTO;
+import com.flightDB.DBApp.dtos.response.SaleFlightDTO;
 import com.flightDB.DBApp.model.Flight;
 import com.flightDB.DBApp.service.FlightsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,10 @@ public class FlightsController {
     public List<Flight> getAllFlightBySearch(@RequestBody FlightSearchDataDTO flightSearchDataDTO) {
         return flightsService.getAllFlightBySearch(flightSearchDataDTO);
     }
+//    @GetMapping(path = "/sales")
+//    public List<SaleFlightDTO> getAllSales() {
+//        return flightsService.getAllFlightWhatIsOnSale();
+//    }
 
     @DeleteMapping(path = "/delete/{id}")
     public void deleteFlight(@PathVariable Long id) {

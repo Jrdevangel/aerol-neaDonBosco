@@ -65,10 +65,13 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "user-reservation-reference")
-    private Set<Reservation> reservations;
+    private Set<Seats> seats;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "user-wallet-reference")
     private Wallet wallet;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HistoryOfPayment> historyOfPaymentList;
 
 }
