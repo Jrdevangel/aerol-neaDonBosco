@@ -25,6 +25,9 @@ public class HistoryOfPayment {
     private String direction;
 
     @Column
+    private String seatsBought;
+
+    @Column
     private double totalPayedMoney;
 
     @ManyToOne
