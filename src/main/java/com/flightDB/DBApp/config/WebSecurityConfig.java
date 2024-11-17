@@ -38,7 +38,8 @@ public class WebSecurityConfig {
                                 "/api/flight/search",
                                 "/api/flight/sales",
                                 "/api/v1/routes/new/routes",
-                                "/api/test/all"
+                                "/api/test/all",
+                                "/api/seats/**"
                         ).permitAll()
 
                         .requestMatchers(

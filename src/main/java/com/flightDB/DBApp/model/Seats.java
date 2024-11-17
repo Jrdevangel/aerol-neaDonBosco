@@ -18,7 +18,7 @@ public class Seats {
     private Long id;
 
     @Column
-    private Integer seatNumber;
+    private String seatName;
 
     @Column
     private boolean isAvailable;
@@ -30,11 +30,12 @@ public class Seats {
     private float discount;
 
     @ManyToOne
-    @JoinColumn(name = "reserved_by_user_id")
+    @JoinColumn(name = "reserved_by_user_id", nullable = true)
     @JsonIgnore
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "flight_id", nullable = false)
+    @JsonIgnore
     private Flight flight;
 }

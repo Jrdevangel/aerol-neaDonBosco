@@ -30,7 +30,7 @@ public class FlightsController {
         return flightsService.getFlightById(id);
     }
 
-    @GetMapping(path = "/search")
+    @PostMapping(path = "/search")
     public List<Flight> getAllFlightBySearch(@RequestBody FlightSearchDataDTO flightSearchDataDTO) {
         return flightsService.getAllFlightBySearch(flightSearchDataDTO);
     }

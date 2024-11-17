@@ -3,6 +3,7 @@ package com.flightDB.DBApp.service;
 import com.flightDB.DBApp.dtos.request.FlightDataToBuyDTO;
 import com.flightDB.DBApp.dtos.request.RequestBoughtDataDTO;
 import com.flightDB.DBApp.dtos.response.ResponseToConfirmDTO;
+import com.flightDB.DBApp.dtos.response.SeatAndPlaneDTO;
 import com.flightDB.DBApp.model.*;
 import com.flightDB.DBApp.repository.ISeatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class SeatsService {
@@ -21,11 +25,27 @@ public class SeatsService {
     @Autowired private FlightsService flightsService;
     @Autowired private HistoryOfPaymentService historyOfPaymentService;
 
-    private List<Seats> getAllSeatsByFlightId(Long flightId) {
+    public List<Seats> getAllSeatsByFlightId(Long flightId) {
         return iSeatRepository.findByFlightId(flightId);
     }
-    private List<Seats> getAllSeatsByUserId(Long userId) {
-        return iSeatRepository.findByUserId(userId);
+    public List<SeatAndPlaneDTO> getAllSeatsByUserId(Long userId) {
+        List<SeatAndPlaneDTO> seatAndPlaneDTOS = new ArrayList<>();
+        List<Seats> seatsList = iSeatRepository.findByUserId(userId);
+        Set<Flight> flightSet = new HashSet<>();
+        for (Seats seat : seatsList) {
+            flightSet.add(seat.getFlight());
+        }
+        for (Flight flight : flightSet) {
+            List<Seats> relatedSeats = new ArrayList<>();
+            for (Seats seat : seatsList) {
+                if (seat.getFlight().equals(flight)) {
+                    relatedSeats.add(seat);
+                }
+            }
+            SeatAndPlaneDTO dto = new SeatAndPlaneDTO(flight, relatedSeats);
+            seatAndPlaneDTOS.add(dto);
+        }
+        return seatAndPlaneDTOS;
     }
     private Seats getSeatById(Long id) {
         return iSeatRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Seat is not found"));
@@ -59,6 +79,7 @@ public class SeatsService {
         if(actualMoney >= totalCost) {
             for (Seats seatToAddUserId : seatsSelected) {
                 seatToAddUserId.setUser(user);
+                seatToAddUserId.setAvailable(false);
             }
             saveAllSeats(seatsSelected);
             userWallet.setEuro(actualMoney - totalCost);
@@ -74,53 +95,65 @@ public class SeatsService {
     }
 
     private void changeSeatsToHistoryOfPayment(List<Seats> seatsList, Flight flight, User user, double totalCost, EStatus status) {
-            HistoryOfPayment historyOfPayment = new HistoryOfPayment();
-            historyOfPayment.setDirection(flight.getOrigin() + " " + flight.getDestination());
-            historyOfPayment.setUser(user);
-            historyOfPayment.setSeatsBought(seatsList.toString());
-            historyOfPayment.setStatus(status);
-            historyOfPayment.setTotalPayedMoney(- totalCost);
-            historyOfPaymentService.saveHistoryOFPayment(historyOfPayment);
+        HistoryOfPayment historyOfPayment = new HistoryOfPayment();
+        historyOfPayment.setDirection(flight.getOrigin() + " -> " + flight.getDestination());
+        historyOfPayment.setUser(user);
+        String seatsBought = seatsList.stream()
+                .map(Seats::getSeatName)
+                .collect(Collectors.joining(","));
+        historyOfPayment.setSeatsBought(seatsBought);
+
+        historyOfPayment.setStatus(status);
+        historyOfPayment.setTotalPayedMoney(totalCost);
+        historyOfPaymentService.saveHistoryOFPayment(historyOfPayment);
     }
+
 
     public ResponseToConfirmDTO cancelBought(RequestBoughtDataDTO requestBoughtDataDTO) {
         Seats seats = getSeatById(requestBoughtDataDTO.getSeatId());
         ResponseToConfirmDTO responseToConfirmDTO = new ResponseToConfirmDTO();
-            if (LocalDateTime.now().isAfter(seats.getFlight().getDepartureTime())) {
-                throw new IllegalArgumentException("You can't return because the time has expires");
-            } else {
-                if (LocalDateTime.now().isAfter(seats.getFlight().getDepartureTime().minusDays(1))) {
-                    double newPrice = seats.getCostOfSeat() / 2;
-                    if(!requestBoughtDataDTO.isConfirmed()) {
-                        responseToConfirmDTO.setText("You'll return this money: " + newPrice + "Pleas confirm if you want to continue");
-                        responseToConfirmDTO.setTotalReturn(false);
-                    }
-                    if(requestBoughtDataDTO.isConfirmed()) {
-                      returnMoney(newPrice, requestBoughtDataDTO.getUserId(), responseToConfirmDTO, seats);
-                } else {
-                    double newPriceOriginal = seats.getCostOfSeat();
-                    returnMoney(newPriceOriginal, requestBoughtDataDTO.getUserId(), responseToConfirmDTO, seats);
-                }
+
+        if (LocalDateTime.now().isAfter(seats.getFlight().getDepartureTime())) {
+            throw new IllegalArgumentException("You can't return because the time has expired");
+        }
+
+        if (LocalDateTime.now().isAfter(seats.getFlight().getDepartureTime().minusDays(1))) {
+            double refundAmount = seats.getCostOfSeat() / 2;
+            if (!requestBoughtDataDTO.isConfirmed()) {
+                responseToConfirmDTO.setText("You'll return this money: " + refundAmount + ". Please confirm if you want to continue");
+                responseToConfirmDTO.setTotalReturn(false);
+                return responseToConfirmDTO;
             }
-                }
+            returnMoney(refundAmount, requestBoughtDataDTO.getUserId(), responseToConfirmDTO, seats);
+        } else {
+            returnMoney(seats.getCostOfSeat(), requestBoughtDataDTO.getUserId(), responseToConfirmDTO, seats);
+        }
+
         return responseToConfirmDTO;
     }
 
     private void returnMoney(double moneyToReturn, Long userId, ResponseToConfirmDTO responseToConfirmDTO, Seats seats) {
         User user = userService.getUserById(userId);
-        Wallet wallet = walletService.getByUserId(user.getId());
-        wallet.setEuro(wallet.getEuro() + moneyToReturn);
-        walletService.saveWallet(wallet);
-        seats.setUser(null);
-        saveSeat(seats);
-        responseToConfirmDTO.setText("You have returned this money: " + moneyToReturn);
-        responseToConfirmDTO.setTotalReturn(true);
+        Wallet wallet = walletService.getByUserId(userId);
+
         HistoryOfPayment historyOfPayment = new HistoryOfPayment();
         historyOfPayment.setStatus(EStatus.Canceled);
         historyOfPayment.setTotalPayedMoney(moneyToReturn);
-        historyOfPayment.setUser(seats.getUser());
-        historyOfPayment.setDirection(seats.getFlight().getOrigin() + " " + seats.getFlight().getDestination());
+        historyOfPayment.setUser(user);
+        historyOfPayment.setDirection(seats.getFlight().getOrigin().getCity() + " - " +
+                seats.getFlight().getDestination().getCity());
+
+        wallet.setEuro(wallet.getEuro() + moneyToReturn);
+        walletService.saveWallet(wallet);
+
+        seats.setUser(null);
+        seats.setAvailable(true);
+        saveSeat(seats);
+
         historyOfPaymentService.saveHistoryOFPayment(historyOfPayment);
+
+        responseToConfirmDTO.setText("You have returned this money: " + moneyToReturn);
+        responseToConfirmDTO.setTotalReturn(true);
     }
 
     private void saveAllSeats(List<Seats> seatsList) {
