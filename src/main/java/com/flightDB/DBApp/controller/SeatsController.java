@@ -1,5 +1,6 @@
 package com.flightDB.DBApp.controller;
 
+import com.flightDB.DBApp.dtos.SeatsWithPriceDTO;
 import com.flightDB.DBApp.dtos.request.FlightDataToBuyDTO;
 import com.flightDB.DBApp.dtos.request.RequestBoughtDataDTO;
 import com.flightDB.DBApp.dtos.response.ResponseToConfirmDTO;
@@ -29,20 +30,9 @@ public class SeatsController {
     public ResponseEntity<?> createReservation(@RequestBody FlightDataToBuyDTO flightDataToBuyDTO) {
         try {
             String result = seatsService.buySeatsInThePlane(flightDataToBuyDTO);
-            Map<String, Object> successResponse = new HashMap<>();
-            successResponse.put("status", "success");
-            successResponse.put("message", result);
-            return ResponseEntity.ok(successResponse);
+           return ResponseEntity.status(HttpStatus.OK).body(result);
         } catch (IllegalArgumentException e) {
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("status", "error");
-            errorResponse.put("message", e.getMessage());
-            return ResponseEntity.badRequest().body(errorResponse);
-        } catch (Exception e) {
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("status", "error");
-            errorResponse.put("message", "An unexpected error occurred while processing your request.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         }
     }
 
@@ -54,6 +44,11 @@ public class SeatsController {
     @GetMapping("/flight/{flightId}")
     public List<Seats> getAllSeatsByFlightId(@PathVariable Long flightId) {
         return seatsService.getAllSeatsByFlightId(flightId);
+    }
+
+    @GetMapping("/countDiscount/flight/{flightId}")
+    public List<SeatsWithPriceDTO> getWithCalculatedPriceSeats(@PathVariable Long flightId) {
+        return seatsService.countNewPriceAndPercentage(flightId);
     }
 
     @PostMapping("/cancel")

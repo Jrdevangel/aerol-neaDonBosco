@@ -1,5 +1,6 @@
 package com.flightDB.DBApp.service;
 
+import com.flightDB.DBApp.dtos.SeatsWithPriceDTO;
 import com.flightDB.DBApp.dtos.request.FlightDataToBuyDTO;
 import com.flightDB.DBApp.dtos.request.RequestBoughtDataDTO;
 import com.flightDB.DBApp.dtos.response.ResponseToConfirmDTO;
@@ -28,6 +29,34 @@ public class SeatsService {
     public List<Seats> getAllSeatsByFlightId(Long flightId) {
         return iSeatRepository.findByFlightId(flightId);
     }
+
+    public List<SeatsWithPriceDTO> countNewPriceAndPercentage(Long flightId) {
+        List<Seats> seatsList = getAllSeatsByFlightId(flightId);
+        List<SeatsWithPriceDTO> seatsWithPriceList = new ArrayList<>();
+        for (Seats seats : seatsList) {
+            double discount = 0;
+            if(seats.getDiscount() > 0) {
+             discount = (seats.getCostOfSeat() - seats.getDiscount());
+            }
+            float percentage = countPercentage(seats.getCostOfSeat(), seats.getDiscount());
+            seatsWithPriceList.add(new SeatsWithPriceDTO(seats, seats.getCostOfSeat() ,discount, percentage - 100));
+        }
+        return seatsWithPriceList;
+    }
+
+    private float countPercentage(double cost, double salePrice) {
+        if (cost == 0) {
+            return 0;
+        }
+        return (float) ((cost - salePrice) / cost * 100);
+    }
+    private double countNewPrice(double cost, double salePrice) {
+        if(cost < salePrice) {
+            new IllegalArgumentException("Sale price is major than cost error");
+        }
+        return cost - salePrice;
+    }
+
     public List<SeatAndPlaneDTO> getAllSeatsByUserId(Long userId) {
         List<SeatAndPlaneDTO> seatAndPlaneDTOS = new ArrayList<>();
         List<Seats> seatsList = iSeatRepository.findByUserId(userId);
@@ -112,11 +141,13 @@ public class SeatsService {
     public ResponseToConfirmDTO cancelBought(RequestBoughtDataDTO requestBoughtDataDTO) {
         Seats seats = getSeatById(requestBoughtDataDTO.getSeatId());
         ResponseToConfirmDTO responseToConfirmDTO = new ResponseToConfirmDTO();
-
+        User user = userService.getUserById(requestBoughtDataDTO.getUserId());
         if (LocalDateTime.now().isAfter(seats.getFlight().getDepartureTime())) {
             throw new IllegalArgumentException("You can't return because the time has expired");
         }
-
+        if (!seats.getUser().equals(user)) {
+            throw new IllegalArgumentException("Has occurred an error");
+        }
         if (LocalDateTime.now().isAfter(seats.getFlight().getDepartureTime().minusDays(1))) {
             double refundAmount = seats.getCostOfSeat() / 2;
             if (!requestBoughtDataDTO.isConfirmed()) {

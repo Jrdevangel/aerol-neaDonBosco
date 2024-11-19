@@ -24,9 +24,11 @@ public class Seats {
     private boolean isAvailable;
 
     @Column
+    @JsonIgnore
     private double costOfSeat;
 
     @Column
+    @JsonIgnore
     private float discount;
 
     @ManyToOne
