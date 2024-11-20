@@ -3,6 +3,7 @@ package com.flightDB.DBApp.service;
 import com.flightDB.DBApp.dtos.SeatsWithPriceDTO;
 import com.flightDB.DBApp.dtos.request.FlightDataToBuyDTO;
 import com.flightDB.DBApp.dtos.request.RequestBoughtDataDTO;
+import com.flightDB.DBApp.dtos.request.SeatDTO;
 import com.flightDB.DBApp.dtos.response.ResponseToConfirmDTO;
 import com.flightDB.DBApp.dtos.response.SeatAndPlaneDTO;
 import com.flightDB.DBApp.model.*;
@@ -185,6 +186,27 @@ public class SeatsService {
 
         responseToConfirmDTO.setText("You have returned this money: " + moneyToReturn);
         responseToConfirmDTO.setTotalReturn(true);
+    }
+
+    public void createListOfSeats(List<SeatDTO> seatDTOList) {
+        List<Seats> seatsList = transferSEATSDTOToSeats(seatDTOList);
+        saveAllSeats(seatsList);
+    }
+
+    private List<Seats> transferSEATSDTOToSeats(List<SeatDTO> seatDTOList) {
+        List<Seats> seatsList = new ArrayList<>();
+        Flight flight = flightsService.getFlightById(seatDTOList.get(0).getFlightId());
+        for (SeatDTO seatDTO : seatDTOList) {
+            Seats seats = new Seats();
+            seats.setCostOfSeat(seatDTO.getCostOfSeat());
+            seats.setSeatName(seatDTO.getSeatName());
+            seats.setDiscount(seatDTO.getDiscount());
+            seats.setFlight(flight);
+            seats.setAvailable(true);
+            seats.setUser(null);
+            seatsList.add(seats);
+        }
+        return seatsList;
     }
 
     private void saveAllSeats(List<Seats> seatsList) {

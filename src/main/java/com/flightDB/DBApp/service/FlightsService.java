@@ -5,7 +5,9 @@ import com.flightDB.DBApp.dtos.request.FlightSearchDataDTO;
 import com.flightDB.DBApp.dtos.response.SaleFlightDTO;
 import com.flightDB.DBApp.model.Flight;
 import com.flightDB.DBApp.model.Routes;
+import com.flightDB.DBApp.model.Seats;
 import com.flightDB.DBApp.repository.IFlightRepository;
+import jakarta.transaction.Transactional;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,8 +21,8 @@ import java.util.stream.Collectors;
 public class FlightsService {
 
     @Autowired private IFlightRepository iFlightRepository;
-
     @Autowired private RoutesService routesService;
+    @Autowired private FlightImageService flightImageService;
 
     public List<Flight> getAllFlight() {
         return (List<Flight>) iFlightRepository.findAll();
@@ -130,6 +132,16 @@ public class FlightsService {
     public Flight getFlightById(Long id) {
         return iFlightRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Flight not found"));
     }
+
+//    @Transactional
+//    public String createFlightWithPassengers(FlightDataToCreate flightDataToCreate) {
+//        if(flightDataToCreate.getFlightImage() == null || flightDataToCreate.getFlight() == null) {
+//            throw new IllegalArgumentException("Not all data is full");
+//        }
+//        createFlight(flightDataToCreate.getFlight());
+//        flightImageService.saveFlightImage(flightDataToCreate.getFlightImage());
+//        return "Flight create successful";
+//    }
 
 
     public Flight createFlight(Flight flight) {

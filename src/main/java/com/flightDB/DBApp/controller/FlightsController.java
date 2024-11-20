@@ -34,11 +34,6 @@ public class FlightsController {
     public List<Flight> getAllFlightBySearch(@RequestBody FlightSearchDataDTO flightSearchDataDTO) {
         return flightsService.getAllFlightBySearch(flightSearchDataDTO);
     }
-//    @GetMapping(path = "/sales")
-//    public List<SaleFlightDTO> getAllSales() {
-//        return flightsService.getAllFlightWhatIsOnSale();
-//    }
-
     @DeleteMapping(path = "/delete/{id}")
     public void deleteFlight(@PathVariable Long id) {
         flightsService.deleteFright(id);

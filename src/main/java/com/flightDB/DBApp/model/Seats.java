@@ -24,11 +24,9 @@ public class Seats {
     private boolean isAvailable;
 
     @Column
-    @JsonIgnore
     private double costOfSeat;
 
     @Column
-    @JsonIgnore
     private float discount;
 
     @ManyToOne
@@ -37,7 +35,7 @@ public class Seats {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "flight_id", nullable = false)
+    @JoinColumn(name = "flight_id")
     @JsonIgnore
     private Flight flight;
 }

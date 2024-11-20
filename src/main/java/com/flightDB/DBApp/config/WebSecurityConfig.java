@@ -81,7 +81,8 @@ public class WebSecurityConfig {
                                 "/api/v1/delete/passengers/{id}",
                                 "/api/test/admin",
                                 "/api/v1/routes",
-                                "/api/v1/passengers"
+                                "/api/v1/passengers",
+                                "/api/seats/create/all"
                         ).hasRole("ADMIN")
 
                         .requestMatchers(

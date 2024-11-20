@@ -3,6 +3,7 @@ package com.flightDB.DBApp.controller;
 import com.flightDB.DBApp.dtos.SeatsWithPriceDTO;
 import com.flightDB.DBApp.dtos.request.FlightDataToBuyDTO;
 import com.flightDB.DBApp.dtos.request.RequestBoughtDataDTO;
+import com.flightDB.DBApp.dtos.request.SeatDTO;
 import com.flightDB.DBApp.dtos.response.ResponseToConfirmDTO;
 import com.flightDB.DBApp.dtos.response.SeatAndPlaneDTO;
 import com.flightDB.DBApp.model.Seats;
@@ -61,48 +62,15 @@ public class SeatsController {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while processing your request");
         }
     }
+    @PostMapping("/create/all")
+    public ResponseEntity<String> createAll(@RequestBody List<SeatDTO> seatDTOList) {
+        try {
+            seatsService.createListOfSeats(seatDTOList);
+            return new ResponseEntity<>("Seats created successfully", HttpStatus.CREATED);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Error creating seats: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
-//
-//
-//
-//    @GetMapping(path = "/reservation/{id}")
-//    public ResponseEntity<Seats> getReservationById(@PathVariable Long id){
-//        Optional<Seats> reservationOpt = seatsService.getReservationById(id);
-//        return reservationOpt.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-//    }
-//
-//
-//    @GetMapping(path = "/reservation")
-//    public ResponseEntity<List<Seats>> getAllReservations(){
-//        List<Seats> seats = seatsService.getAllReservations();
-//        return ResponseEntity.ok(seats);
-//    }
-//
-//
-//    @PutMapping(path = "/update/reservation/{id}")
-//    public ResponseEntity<?> updateReservation(@PathVariable Long id,@RequestBody Seats seats) {
-//        try {
-//            Seats savedSeats = seatsService.updateReservation(id , seats);
-//            return new ResponseEntity<>(savedSeats, HttpStatus.OK);
-//        } catch (IllegalArgumentException ex) {
-//            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
-//        }
-//    }
-//
-//
-//    @DeleteMapping(path = "/delete/reservation/{id}")
-//    public ResponseEntity<Void> deleteReservation(@PathVariable Long id){
-//        seatsService.deleteReservation(id);
-//        return ResponseEntity.noContent().build();
-//    }
-//
-//    @PutMapping(path = "/return/{reservationId}")
-//    public String returnReservation(@PathVariable Long reservationId) {
-//        return seatsService.returnReservation(reservationId);
-//    }
-//
-//    @GetMapping(path = "/reservation/user/{userId}")
-//    public List<Seats> getAllReservationByUserId(@PathVariable Long userId) {
-//        return seatsService.getAllReservationByUserId(userId);
-//    }
 }
