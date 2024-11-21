@@ -10,23 +10,27 @@ public class InsertRoutesService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    // Método que inserta los datos en la tabla `routes`
+    @Autowired private SeatsService seatsService;
+
     public void insertInitialRoutes() {
-        // Consulta SQL para insertar datos sin el campo `id`
+        String checkQuery = "SELECT COUNT(*) FROM routes WHERE city = ? AND country = ?";
         String insertQuery = "INSERT INTO routes (city, country) VALUES (?, ?)";
 
-        // Datos a insertar
         Object[][] routesData = {
                 {"Seville", "Portugal"},
                 {"Berlin", "Germany"},
                 {"Florence", "Italy"}
         };
 
-        // Insertar cada fila de datos
+        // Обробка кожного запису
         for (Object[] route : routesData) {
-            jdbcTemplate.update(insertQuery, route);
+            Integer count = jdbcTemplate.queryForObject(checkQuery, Integer.class, route);
+            if (count != null && count == 0) {
+                jdbcTemplate.update(insertQuery, route);
+            }
         }
 
-        System.out.println("Inserciones completadas exitosamente en la tabla routes!");
+        System.out.println("Вставки завершено успішно!");
     }
+
 }

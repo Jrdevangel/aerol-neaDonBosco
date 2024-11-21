@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">  <!-- Змінили статус на INFO для кращої видимості логів -->
+    <Appenders>
+        <!-- Консольний апендер -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout>
+                <!-- Формат виведення логу: дата, рівень логування, ім'я логера, повідомлення -->
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss} [%level] %logger{36} - %msg%n</Pattern>
+            </PatternLayout>
+        </Console>
+
+        <!-- Файл апендер для збереження логів в файл -->
+        <File name="File" fileName="logs/app.log">
+            <PatternLayout>
+                <!-- Формат виведення для файлу: дата, рівень, логер, повідомлення -->
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss} [%level] %logger{36} - %msg%n</Pattern>
+            </PatternLayout>
+        </File>
+    </Appenders>
+
+    <Loggers>
+        <!-- Логер для пакету com.flightDB.DBApp.service з рівнем DEBUG -->
+        <Logger name="com.flightDB.DBApp.service" level="debug" additivity="false">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="File" />
+        </Logger>
+
+        <!-- Кореневий логер з рівнем INFO для всіх пакетів -->
+        <Root level="info">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="File" />
+        </Root>
+    </Loggers>
+</Configuration>
