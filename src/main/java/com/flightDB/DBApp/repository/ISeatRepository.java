@@ -8,4 +8,6 @@ import java.util.List;
 public interface ISeatRepository extends CrudRepository<Seats, Long> {
     List<Seats> findByUserId(Long userId);
     List<Seats> findByFlightId(Long flightId);
+    void deleteByFlightId(Long flightId);
+
 }

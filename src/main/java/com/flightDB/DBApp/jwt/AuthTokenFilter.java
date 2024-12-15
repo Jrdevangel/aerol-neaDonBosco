@@ -1,6 +1,5 @@
 package com.flightDB.DBApp.jwt;
 
-
 import com.flightDB.DBApp.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

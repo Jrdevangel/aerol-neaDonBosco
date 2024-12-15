@@ -38,4 +38,7 @@ public class Seats {
     @JoinColumn(name = "flight_id")
     @JsonIgnore
     private Flight flight;
+
+    Seats seats = new Seats();
+    Long flightID = SeatsUtils.flight(seats);
 }

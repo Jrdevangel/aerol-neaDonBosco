@@ -23,11 +23,16 @@ import java.util.stream.Collectors;
 @Service
 public class SeatsService {
 
-    @Autowired private ISeatRepository iSeatRepository;
-    @Autowired private WalletService walletService;
-    @Autowired private UserService userService;
-    @Autowired private FlightsService flightsService;
-    @Autowired private HistoryOfPaymentService historyOfPaymentService;
+    @Autowired
+    private ISeatRepository iSeatRepository;
+    @Autowired
+    private WalletService walletService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private FlightsService flightsService;
+    @Autowired
+    private HistoryOfPaymentService historyOfPaymentService;
     private static final Logger logger = LoggerFactory.getLogger(SeatsService.class);
 
     public List<Seats> getAllSeatsByFlightId(Long flightId) {
@@ -39,11 +44,11 @@ public class SeatsService {
         List<SeatsWithPriceDTO> seatsWithPriceList = new ArrayList<>();
         for (Seats seats : seatsList) {
             double discount = 0;
-            if(seats.getDiscount() > 0) {
-             discount = (seats.getCostOfSeat() - seats.getDiscount());
+            if (seats.getDiscount() > 0) {
+                discount = (seats.getCostOfSeat() - seats.getDiscount());
             }
             float percentage = countPercentage(seats.getCostOfSeat(), seats.getDiscount());
-            seatsWithPriceList.add(new SeatsWithPriceDTO(seats, seats.getCostOfSeat() ,discount, percentage - 100));
+            seatsWithPriceList.add(new SeatsWithPriceDTO(seats, seats.getCostOfSeat(), discount, percentage - 100));
         }
         return seatsWithPriceList;
     }
@@ -54,8 +59,9 @@ public class SeatsService {
         }
         return (float) ((cost - salePrice) / cost * 100);
     }
+
     private double countNewPrice(double cost, double salePrice) {
-        if(cost < salePrice) {
+        if (cost < salePrice) {
             new IllegalArgumentException("Sale price is major than cost error");
         }
         return cost - salePrice;
@@ -80,6 +86,7 @@ public class SeatsService {
         }
         return seatAndPlaneDTOS;
     }
+
     private Seats getSeatById(Long id) {
         return iSeatRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Seat is not found"));
     }
@@ -87,7 +94,7 @@ public class SeatsService {
     public String buySeatsInThePlane(FlightDataToBuyDTO flightDataToBuyDTO) {
         List<Seats> allSeatsOfFlightList = getAllSeatsByFlightId(flightDataToBuyDTO.getFlightId());
         List<Seats> seatsSelected = new ArrayList<>();
-        for(Seats seatOfFlight : allSeatsOfFlightList) {
+        for (Seats seatOfFlight : allSeatsOfFlightList) {
             for (Long seatsId : flightDataToBuyDTO.getSeatIdList()) {
                 if (seatOfFlight.getId() == seatsId) {
                     seatsSelected.add(seatOfFlight);
@@ -97,10 +104,10 @@ public class SeatsService {
         Wallet userWallet = walletService.getByUserId(flightDataToBuyDTO.getUserId());
         double totalCost = 0;
         for (Seats seatToBuy : seatsSelected) {
-            if(seatToBuy.getDiscount() < 0) {
+            if (seatToBuy.getDiscount() < 0) {
                 throw new IllegalArgumentException("Discount is less 0");
             }
-            if(seatToBuy.getDiscount() == 0) {
+            if (seatToBuy.getDiscount() == 0) {
                 totalCost += seatToBuy.getCostOfSeat();
             } else {
                 totalCost += seatToBuy.getCostOfSeat() - seatToBuy.getDiscount();
@@ -109,7 +116,7 @@ public class SeatsService {
         Flight flight = flightsService.getFlightById(flightDataToBuyDTO.getFlightId());
         User user = userService.getUserById(flightDataToBuyDTO.getUserId());
         double actualMoney = userWallet.getEuro();
-        if(actualMoney >= totalCost) {
+        if (actualMoney >= totalCost) {
             for (Seats seatToAddUserId : seatsSelected) {
                 seatToAddUserId.setUser(user);
                 seatToAddUserId.setAvailable(false);
@@ -127,7 +134,8 @@ public class SeatsService {
         }
     }
 
-    private void changeSeatsToHistoryOfPayment(List<Seats> seatsList, Flight flight, User user, double totalCost, EStatus status) {
+    private void changeSeatsToHistoryOfPayment(List<Seats> seatsList, Flight flight, User user, double totalCost,
+            EStatus status) {
         HistoryOfPayment historyOfPayment = new HistoryOfPayment();
         historyOfPayment.setDirection(flight.getOrigin() + " -> " + flight.getDestination());
         historyOfPayment.setUser(user);
@@ -141,7 +149,6 @@ public class SeatsService {
         historyOfPayment.setLocalDateTime(LocalDateTime.now());
         historyOfPaymentService.saveHistoryOFPayment(historyOfPayment);
     }
-
 
     public ResponseToConfirmDTO cancelBought(RequestBoughtDataDTO requestBoughtDataDTO) {
         logger.debug("Received request: seatId={}, userId={}, isConfirmed={}",
@@ -170,13 +177,13 @@ public class SeatsService {
         if (now.isAfter(flightDeparture.minusDays(1))) {
             double refundAmount = seats.getCostOfSeat() / 2;
 
-//            if (!requestBoughtDataDTO.getIsConfirmed().equals("false")) {
-//                logger.debug("is false case");
-//                responseToConfirmDTO.setText("You'll receive a refund of: " + refundAmount +
-//                        ". Please confirm if you want to continue.");
-//                responseToConfirmDTO.setTotalReturn(false);
-//                return responseToConfirmDTO;
-//            }
+            // if (!requestBoughtDataDTO.getIsConfirmed().equals("false")) {
+            // logger.debug("is false case");
+            // responseToConfirmDTO.setText("You'll receive a refund of: " + refundAmount +
+            // ". Please confirm if you want to continue.");
+            // responseToConfirmDTO.setTotalReturn(false);
+            // return responseToConfirmDTO;
+            // }
 
             returnMoney(refundAmount, requestBoughtDataDTO.getUserId(), responseToConfirmDTO, seats);
         } else {
@@ -190,8 +197,8 @@ public class SeatsService {
         return responseToConfirmDTO;
     }
 
-
-    private void returnMoney(double moneyToReturn, Long userId, ResponseToConfirmDTO responseToConfirmDTO, Seats seats) {
+    private void returnMoney(double moneyToReturn, Long userId, ResponseToConfirmDTO responseToConfirmDTO,
+            Seats seats) {
         User user = userService.getUserById(userId);
         Wallet wallet = walletService.getByUserId(userId);
 
@@ -221,6 +228,10 @@ public class SeatsService {
         saveAllSeats(seatsList);
     }
 
+    public void deleteAllSeatsFromFlight(Long flightId) {
+        this.iSeatRepository.deleteByFlightId(flightId);
+    }
+
     private List<Seats> transferSEATSDTOToSeats(List<SeatDTO> seatDTOList) {
         List<Seats> seatsList = new ArrayList<>();
         Flight flight = flightsService.getFlightById(seatDTOList.get(0).getFlightId());
@@ -242,7 +253,31 @@ public class SeatsService {
     private void saveAllSeats(List<Seats> seatsList) {
         iSeatRepository.saveAll(seatsList);
     }
+
     private void saveSeat(Seats seats) {
         iSeatRepository.save(seats);
     }
+
+    public void deleteListOfSeats(List<SeatDTO> seatDTOList) {
+        iSeatRepository.delete(Seats.builder().build());
+    }
+
+    public void updateList(List<SeatDTO> seatDTOList) {
+        iSeatRepository.Save(Seats.builder()); // Los repositorios no tienen metodo update debes utilizar Save, es un
+                                                 // "Upset"
+    }
+    public void deleteAllHistoryPaymentByUserId(Long userId) {
+        historyOfPaymentService.deleteByUserId(userId);
+    }
+
+
+
+
+
 }
+
+// delete all history of payement by userId
+
+
+
+

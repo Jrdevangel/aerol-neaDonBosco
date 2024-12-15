@@ -8,30 +8,26 @@ import com.flightDB.DBApp.dtos.response.ResponseToConfirmDTO;
 import com.flightDB.DBApp.dtos.response.SeatAndPlaneDTO;
 import com.flightDB.DBApp.model.Seats;
 import com.flightDB.DBApp.service.SeatsService;
-import jakarta.persistence.Column;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/seats")
 @CrossOrigin(origins = "*")
 public class SeatsController {
 
-    @Autowired private SeatsService seatsService;
+    @Autowired
+    private SeatsService seatsService;
 
     @PostMapping(path = "/new/reservation")
     public ResponseEntity<?> createReservation(@RequestBody FlightDataToBuyDTO flightDataToBuyDTO) {
         try {
             String result = seatsService.buySeatsInThePlane(flightDataToBuyDTO);
-           return ResponseEntity.status(HttpStatus.OK).body(result);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         }
@@ -62,6 +58,7 @@ public class SeatsController {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while processing your request");
         }
     }
+
     @PostMapping("/create/all")
     public ResponseEntity<String> createAll(@RequestBody List<SeatDTO> seatDTOList) {
         try {
@@ -73,4 +70,33 @@ public class SeatsController {
         }
     }
 
+    @PostMapping("/delete/all")
+    public ResponseEntity<String> deleteSeats(@RequestBody List<SeatDTO> seatDTOList) {
+        try {
+            seatsService.deleteListOfSeats(seatDTOList);
+            return new ResponseEntity<>("Seats deleted successfully", HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error deleting seats: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/flight/seats/{flightId}")
+    public ResponseEntity<String> deleteAllSeatsFromFlight(@PathVariable("flightId") Long flightId) {
+        try {
+            seatsService.deleteAllSeatsFromFlight(flightId);
+            return new ResponseEntity<>("Seats deleted successfully on flight " + flightId, HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error deleting seats: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("update/all")
+    public ResponseEntity<String> updateSeats(@RequestBody List<SeatDTO> seatDTOList) {
+        try {
+            seatsService.updateList(seatDTOList);
+            return new ResponseEntity<>("Seats updated successfully", HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error updating seas: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

@@ -22,7 +22,6 @@ public class InsertRoutesService {
                 {"Florence", "Italy"}
         };
 
-        // Обробка кожного запису
         for (Object[] route : routesData) {
             Integer count = jdbcTemplate.queryForObject(checkQuery, Integer.class, route);
             if (count != null && count == 0) {
@@ -32,5 +31,4 @@ public class InsertRoutesService {
 
         System.out.println("Вставки завершено успішно!");
     }
-
 }

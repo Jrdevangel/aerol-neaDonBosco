@@ -20,7 +20,6 @@ import java.util.Arrays;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
-
     private final AuthenticationProvider authenticationProvider;
     private final AuthTokenFilter authTokenFilter;
 
