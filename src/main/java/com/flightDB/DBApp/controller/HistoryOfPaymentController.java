@@ -21,9 +21,11 @@ public class HistoryOfPaymentController {
             historyOfPaymentService.deleteSeat(seatId);
             return ResponseEntity.ok("Seat with ID " + seatId + " successfully eliminated.");
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>("Failed to delete seat with ID " + seatId + ": " + e.getMessage(), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Failed to delete seat with ID " + seatId + ": " + e.getMessage(),
+                    HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return new ResponseEntity<>("Failed to delete seat with ID " + seatId + ": " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Failed to delete seat with ID " + seatId + ": " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
